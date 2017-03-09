@@ -81,6 +81,8 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         private static final Message T_column3 = message("xmlui.administrative.item.EditItemMetadataForm.column3");
         private static final Message T_column4 = message("xmlui.administrative.item.EditItemMetadataForm.column4");
         private static final Message T_unlock = message("xmlui.authority.confidence.unlock.help");
+        
+        private static final Message T_coordenadas_link = message("xmlui.administrative.item.EditItemMetadataForm.coordenadas.link");
 
         public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
             Item item = Item.find(context, parameters.getParameterAsInteger("itemID", -1));
@@ -274,6 +276,13 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                                 Button unlock = authValue.addButton("authority_unlock_"+index,"ds-authority-lock");
                                 unlock.setHelp(T_unlock);
                             }
+
+                            if ("dc_coverage_spatial".equals(fieldKey))
+                            {
+                                String vocabularyUrl = "javascript:obtenCoordenadas('" + contextPath + "','" + "value_" + index + "')";
+                                mdCell.addXref(vocabularyUrl).addContent(T_coordenadas_link);
+                            }
+
                             if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey))
                             {
                                 mdValue.setChoices(fieldKey);

@@ -95,6 +95,8 @@ public class DescribeStep extends AbstractSubmissionStep
     private static DCInputsReader INPUTS_READER = null;
     private static final Message T_vocabulary_link = message("xmlui.Submission.submit.DescribeStep.controlledvocabulary.link");
 
+    private static final Message T_coordenadas_link = message("xmlui.Submission.submit.DescribeStep.coordenadas.link");
+
     /**
      * Ensure that the inputs reader has been initialized, this method may be
      * called multiple times with no ill-effect.
@@ -1157,11 +1159,19 @@ public class DescribeStep extends AbstractSubmissionStep
             Text text = item.addText(fieldName, "submit-text");
 
             if(dcInput.getVocabulary() != null){
-                String vocabularyUrl = new DSpace().getConfigurationService().getProperty("dspace.url");
-                vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
-                //Also hand down the field name so our summoning script knows the field the selected value is to end up in
-                vocabularyUrl += "&metadataFieldName=" + fieldName;
-                item.addXref("vocabulary:" + vocabularyUrl).addContent(T_vocabulary_link);
+                if("coordenadas".equals(dcInput.getVocabulary()))
+                {
+                    String vocabularyUrl = "javascript:obtenCoordenadas('" + contextPath + "','" + fieldName + "')";
+                    item.addXref(vocabularyUrl).addContent(T_coordenadas_link);
+                }
+                else
+                {
+                    String vocabularyUrl = new DSpace().getConfigurationService().getProperty("dspace.url");
+                    vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
+                    //Also hand down the field name so our summoning script knows the field the selected value is to end up in
+                    vocabularyUrl += "&metadataFieldName=" + fieldName;
+                    item.addXref("vocabulary:" + vocabularyUrl).addContent(T_vocabulary_link);
+                }
             }
             
                 // Setup the select field

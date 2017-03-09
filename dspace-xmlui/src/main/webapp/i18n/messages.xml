@@ -777,6 +777,9 @@
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Please wait while the controlled vocabulary is loading.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
 
+	<message key="xmlui.Submission.submit.DescribeStep.coordenadas.link">Selecciona coordenadas en el mapa</message>
+
+
 
     <!-- org.dspace.app.xmlui.Submission.submit.AccessStep -->
     <message key="xmlui.Submission.submit.AccessStep.head">Access Settings</message>
@@ -1614,6 +1617,9 @@
 	<message key="xmlui.administrative.item.EditItemMetadataForm.column2">Name</message>
 	<message key="xmlui.administrative.item.EditItemMetadataForm.column3">Value</message>
 	<message key="xmlui.administrative.item.EditItemMetadataForm.column4">Language</message>
+
+	<message key="xmlui.administrative.item.EditItemMetadataForm.coordenadas.link">Selecciona coordenadas en el mapa</message>
+
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemStatusForm -->
 	<message key="xmlui.administrative.item.EditItemStatusForm.title">Item Status</message>
