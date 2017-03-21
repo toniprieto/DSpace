@@ -124,6 +124,7 @@
                 </div>
                 <div class="col-sm-8">
                     <xsl:call-template name="itemSummaryView-DIM-abstract"/>
+                    <xsl:call-template name="itemSummaryView-DIM-coveragespatial"/> 	
                     <xsl:call-template name="itemSummaryView-DIM-URI"/>
                     <xsl:call-template name="itemSummaryView-collections"/>
                 </div>
@@ -739,6 +740,148 @@
         <!--Lookup the MIME Type's key in messages.xml language file.  If not found, just display MIME Type-->
         <i18n:text i18n:key="{$mimetype-key}"><xsl:value-of select="$mimetype"/></i18n:text>
     </xsl:template>
+
+ <xsl:template name="itemSummaryView-DIM-coveragespatial">
+        <xsl:if test="dim:field[@element='coverage' and @qualifier='spatial'] and contains(dim:field[@element='coverage' and @qualifier='spatial'],'east=') and contains(dim:field[@element='coverage' and @qualifier='spatial'],'north=')">
+         
+                        <div class="simple-item-view-coveragespatial item-page-field-wrapper table">
+                <h5 class="coveragespatial"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-coveragespatial</i18n:text></h5>
+                <div>
+                  <xsl:for-each select="dim:field[@element='coverage' and @qualifier='spatial']">
+                  	<xsl:if test="contains(.,'east=') and contains(.,'north=')">
+                    <xsl:variable name="nomlloc">
+                    	<xsl:choose>
+                    	<xsl:when test="contains(substring-after(.,'name='),'; ')">
+                    		<xsl:value-of select="substring-before(substring-after(.,'name='),'; ')" />
+                    	</xsl:when>
+                    	<xsl:otherwise>
+                    	     <xsl:value-of select="substring-after(.,'name=')" />
+                    	</xsl:otherwise>
+                    	</xsl:choose>	
+                    </xsl:variable>
+                    <xsl:variable name="latitud">
+                    	<xsl:choose>
+                    	<xsl:when test="contains(substring-after(.,'north='),'; ')">
+                    		<xsl:value-of select="substring-before(substring-after(.,'north='),'; ')" />
+                    	</xsl:when>
+                    	<xsl:otherwise>
+                    	     <xsl:value-of select="substring-after(.,'north=')" />
+                    	</xsl:otherwise>
+                    	</xsl:choose>	
+                    </xsl:variable>
+                    <xsl:variable name="longitud">
+                    	<xsl:choose>
+                    	<xsl:when test="contains(substring-after(.,'east='),'; ')">
+                    		<xsl:value-of select="substring-before(substring-after(.,'east='),'; ')" />
+                    	</xsl:when>
+                    	<xsl:otherwise>
+                    	     <xsl:value-of select="substring-after(.,'east=')" />
+                    	</xsl:otherwise>
+                    	</xsl:choose>	
+                    </xsl:variable>
+                	<div>
+                		<a >
+                		<xsl:attribute name="onclick">javascript:centra(<xsl:value-of select="$latitud"/>,<xsl:value-of select="$longitud"/>);</xsl:attribute>
+                		<i class="glyphicon glyphicon-map-marker" data-aria="hidden"><sup><xsl:value-of select="position()"/></sup></i><xsl:if test="$nomlloc != ''">: <xsl:value-of select="$nomlloc"/></xsl:if></a>
+                	</div>
+                	</xsl:if> 
+                </xsl:for-each>
+                 	<div class="container-fluid" id="mapdiv" style="height: 200px; "></div>
+                 	<script>
+                 	<xsl:attribute name="src">
+                 		<xsl:value-of select="concat($theme-path,'/vendor/leaflet/dist/leaflet.js')" />
+                 	</xsl:attribute>
+                 	</script>
+  					<script>
+                 	<xsl:attribute name="src">
+                 		<xsl:value-of select="concat($theme-path,'/scripts/leaflet.awesome-markers.js')" />
+                 	</xsl:attribute>
+                 	</script>
+					<script>                    
+					var map;
+					var markers;
+					  
+					  function centra(lat,lng)
+					  {
+					  	map.setView(new L.LatLng(lat,lng),8);
+					  	
+					  	return false;
+					  }
+					  
+					  function initMap() 
+					  {
+
+						var openStreeMapUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+						var openStreeMapAttr = '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors | ' + '<a href="http://example.com">Example</a>'
+						var openStreetMap = L.tileLayer(openStreeMapUrl, {id: 'openstreetMap.default', attribution: openStreeMapAttr, maxZoom: 20, minZoom: 2});
+						markers = [];
+
+						map = L.map('mapdiv', {
+						zoomControl: false,
+						layers: [openStreetMap]
+						});
+
+					<xsl:for-each select="dim:field[@element='coverage' and @qualifier='spatial']">
+						<xsl:if test="contains(.,'east=') and contains(.,'north=')">
+		                <xsl:variable name="nomlloc">
+		                	<xsl:choose>
+		                	<xsl:when test="contains(substring-after(.,'name='),'; ')">
+		                		<xsl:value-of select="substring-before(substring-after(.,'name='),'; ')" />
+		                	</xsl:when>
+		                	<xsl:otherwise>
+		                	     <xsl:value-of select="substring-after(.,'name=')" />
+		                	</xsl:otherwise>
+		                	</xsl:choose>	
+		                </xsl:variable>
+		                <xsl:variable name="latitud">
+		                	<xsl:choose>
+		                	<xsl:when test="contains(substring-after(.,'north='),'; ')">
+		                		<xsl:value-of select="substring-before(substring-after(.,'north='),'; ')" />
+		                	</xsl:when>
+		                	<xsl:otherwise>
+		                	     <xsl:value-of select="substring-after(.,'north=')" />
+		                	</xsl:otherwise>
+		                	</xsl:choose>	
+		                </xsl:variable>
+		                <xsl:variable name="longitud">
+		                	<xsl:choose>
+		                	<xsl:when test="contains(substring-after(.,'east='),'; ')">
+		                		<xsl:value-of select="substring-before(substring-after(.,'east='),'; ')" />
+		                	</xsl:when>
+		                	<xsl:otherwise>
+		                	     <xsl:value-of select="substring-after(.,'east=')" />
+		                	</xsl:otherwise>
+		                	</xsl:choose>	
+		                </xsl:variable>
+
+
+							var marker_<xsl:value-of select="position()"/> = new L.marker([<xsl:value-of select="$latitud"/>, <xsl:value-of select="$longitud"/>],{icon: L.AwesomeMarkers.icon({icon: '', markerColor: 'darkblue',prefix: 'fa',html: '<xsl:value-of select="position()"/>' }) });
+							
+							<xsl:if test="$nomlloc != ''">
+							marker_<xsl:value-of select="position()"/>.bindPopup("<xsl:value-of select="$nomlloc"/>");
+							</xsl:if>
+						
+							marker_<xsl:value-of select="position()"/>.addTo(map);
+							markers.push(marker_<xsl:value-of select="position()"/>);
+					  </xsl:if>
+				  </xsl:for-each>	
+
+						var group = new L.featureGroup(markers);
+						map.fitBounds(group.getBounds(),{padding: [50,50]}); 
+
+					  	if (markers.length == 1)
+						{
+					  		map.setZoom(8);
+					  	}
+					  }
+					  initMap();
+					</script>
+                </div>
+            </div>
+
+        </xsl:if>
+    </xsl:template>
+
 
 
 </xsl:stylesheet>
