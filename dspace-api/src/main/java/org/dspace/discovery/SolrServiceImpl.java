@@ -1545,6 +1545,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if("location.comm".equals(field) || "location.coll".equals(field))
         {
             int type = ("location.comm").equals(field) ? Constants.COMMUNITY : Constants.COLLECTION;
+            return type + ":" + value;
+
+            /*
             DSpaceObject commColl = null;
             if (StringUtils.isNotBlank(value))
             {
@@ -1554,6 +1557,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 return commColl.getName();
             }
+            */
 
         }
         return value;
