@@ -7,6 +7,7 @@
  */
 package org.dspace.browse;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +48,13 @@ public class ItemCountDAOSolr implements ItemCountDAO
      * it is now. If we switch to a Spring-based instantiation we should mark
      * this bean as prototype
      **/
-    private Map<String, Integer> communitiesCount = null;
+    private static Map<String, Integer> communitiesCount = null;
 
     /** Hold the collection item count obtained from SOLR after the first query **/
-    private Map<String, Integer> collectionsCount = null;
-    
+    private static Map<String, Integer> collectionsCount = null;
+
+    /** Hold last time count is calculated **/
+    private static long lastTime = 0;
 
     /** Solr search service */
     SearchService searcher = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class);
@@ -78,7 +81,15 @@ public class ItemCountDAOSolr implements ItemCountDAO
     @Override
     public int getCount(DSpaceObject dso) throws ItemCountException
     {
-    	loadCount();
+        //getting community/collection counter every minute
+        long now = (new Date()).getTime();
+        if ((communitiesCount == null && collectionsCount == null)
+                || ( now - lastTime > 60*1000 ) )
+        {
+            lastTime = now;
+            loadCount();
+        }
+
     	Integer val;
     	if (dso instanceof Collection)
         {
@@ -111,11 +122,11 @@ public class ItemCountDAOSolr implements ItemCountDAO
      */
     private void loadCount() throws ItemCountException
     {
-    	if (communitiesCount != null || collectionsCount != null)
-    	{
-            return;
-    	}
-    	
+    	//if (communitiesCount != null || collectionsCount != null)
+    	//{
+        //    return;
+    	//}
+
     	communitiesCount = new HashMap<String, Integer>();
         collectionsCount = new HashMap<String, Integer>();
         
