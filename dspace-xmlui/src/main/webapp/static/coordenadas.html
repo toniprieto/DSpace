@@ -45,6 +45,7 @@
 		geocoder.geocode({'location': new google.maps.LatLng(latParam, lngParam)}, function(results, status) {
 			if (status === google.maps.GeocoderStatus.OK) 
 			{
+				//Primero miramos el resultado en la posicion 1 (mas especifico)
 				if (results[1])
 				{
 					//window.alert(results[1].formatted_address);
@@ -52,8 +53,16 @@
 				} 
 				else 
 				{
-					//window.alert('No results found');
-					retornaResultat("");
+                    //Sino la posicion 0
+                    if (results[0]) {
+                        //window.alert(results[0].formatted_address);
+                        retornaResultat("; name=" + results[0].formatted_address);
+                    }
+                    else
+                    {
+                        //window.alert('No results found');
+                        retornaResultat("");
+                    }
 				}
 			} 
 			else 
