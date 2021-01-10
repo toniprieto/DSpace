@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -38,6 +39,8 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.LicenseService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1109,6 +1112,30 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         //personD no submission powers
 
+        // For testing with configuration key: org.dspace.content.Collection.findAuthorizedPerformanceOptimize = true
+        // personE can submit to 3 collections:
+        // collectionA, because personE is member of the admin group of collectionA
+        // collectionC, because personE is member of a subgroups of the admin group of collectionC
+        // collectionAB, because personE is member of the admin group of a parent community of collectionAB
+
+        // personE is member of groupE and groupE is the admin group of collectionA
+        EPerson epersonE = ePersonService.create(context);
+        Group groupE = groupService.create(context);
+        groupService.addMember(context, groupE, epersonE);
+        authorizeService.addPolicy(context, collectionA, Constants.ADMIN, groupE);
+
+        // GroupE is member of SuperGroupE and SuperGroupE is the admin group of collectionC
+        Group SuperGroupE = groupService.create(context);
+        groupService.addMember(context, SuperGroupE, groupE);
+        authorizeService.addPolicy(context, collectionC, Constants.ADMIN, SuperGroupE);
+
+        // Eperson2 is admin of community subcomA that has the next structure:
+        // com -> subcomA -> subcomB -> colleccionAB
+        Community subcomA = communityService.create(com, context);
+        Community subcomB = communityService.create(subcomA, context);
+        Collection collectionAB = collectionService.create(context, subcomB);
+        authorizeService.addPolicy(context, subcomA, Constants.ADMIN, groupE);
+
         context.restoreAuthSystemState();
 
         context.setCurrentUser(epersonA);
@@ -1138,6 +1165,24 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         assertFalse("testFindAuthorizeOptimized D.A", personDCollections.contains(collectionA));
         assertFalse("testFindAuthorizeOptimized D.B", personDCollections.contains(collectionB));
         assertFalse("testFindAuthorizeOptimized D.C", personDCollections.contains(collectionC));
+
+        // Test with option org.dspace.content.Collection.findAuthorizedPerformanceOptimize = true
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        boolean defaultOptionValue = configurationService
+            .getBooleanProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize");
+        configurationService.setProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize", true);
+
+        context.setCurrentUser(epersonE);
+        List<Collection>  personECollections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
+        assertEquals("testFindAuthorizeOptimized E", personECollections.size(), 3);
+        assertTrue("testFindAuthorizeOptimized E.A", personECollections.contains(collectionA));
+        assertFalse("testFindAuthorizeOptimized E.B", personECollections.contains(collectionB));
+        assertTrue("testFindAuthorizeOptimized E.C", personECollections.contains(collectionC));
+        assertTrue("testFindAuthorizeOptimized E.AB", personECollections.contains(collectionAB));
+
+        // Restore the default property value
+        configurationService
+            .setProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize", defaultOptionValue);
     }
 
     /**
