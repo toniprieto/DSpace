@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.dspace.app.rest.model.SubmissionCCLicenseRest;
 import org.dspace.core.Context;
@@ -32,7 +33,14 @@ public class SubmissionCCLicenseRestRepository extends DSpaceRestRepository<Subm
     @Override
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public SubmissionCCLicenseRest findOne(final Context context, final String licenseId) {
-        CCLicense ccLicense = creativeCommonsService.findOne(licenseId);
+
+        Locale locale = context.getCurrentLocale();
+        CCLicense  ccLicense;
+        if (locale != null) {
+            ccLicense = creativeCommonsService.findOne(licenseId, locale.toString());
+        } else {
+            ccLicense = creativeCommonsService.findOne(licenseId);
+        }
         if (ccLicense == null) {
             throw new ResourceNotFoundException("No CC license could be found for ID: " + licenseId );
         }
@@ -43,7 +51,13 @@ public class SubmissionCCLicenseRestRepository extends DSpaceRestRepository<Subm
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<SubmissionCCLicenseRest> findAll(final Context context, final Pageable pageable) {
 
-        List<CCLicense> allCCLicenses = creativeCommonsService.findAllCCLicenses();
+        Locale locale = context.getCurrentLocale();
+        List<CCLicense> allCCLicenses;
+        if (locale != null) {
+            allCCLicenses = creativeCommonsService.findAllCCLicenses(locale.toString());
+        } else {
+            allCCLicenses = creativeCommonsService.findAllCCLicenses();
+        }
         return converter.toRestPage(allCCLicenses, pageable, utils.obtainProjection());
     }
 

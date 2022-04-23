@@ -106,7 +106,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
         for (String license : licenses) {
 
-            String licenseUri = ccLicenseUrl + "/license/" + license;
+            String licenseUri = ccLicenseUrl + "/license/" + license + "?locale=" + language;
             HttpGet licenseHttpGet = new HttpGet(licenseUri);
             try (CloseableHttpResponse response = client.execute(licenseHttpGet)) {
                 CCLicense ccLicense = retrieveLicenseObject(license, response);
@@ -333,8 +333,9 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     @Override
     public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
         String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
+        String  defaultLanguage = configurationService.getProperty("cc.license.locale", "en");
 
-        String issueUrl = ccLicenseUrl + "/details?license-uri=" + licenseURI;
+        String issueUrl = ccLicenseUrl + "/details?locale=" + defaultLanguage + "&license-uri=" + licenseURI;
 
         URL request_url;
         try {
