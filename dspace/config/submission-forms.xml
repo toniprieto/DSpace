@@ -173,7 +173,7 @@
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Language</label>
-                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <input-type>onebox</input-type>
                     <hint>Select the language of the main content of the item. If the language does not appear in the
                         list, please select 'Other'. If the content does not really have a language (for example, if it
                         is a dataset or an image) please select 'N/A'.
