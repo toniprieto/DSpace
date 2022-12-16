@@ -166,6 +166,15 @@
       </analyzer>
     </fieldType>
     
+    <fieldType name="lowerCaseUnaccentedSort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.ASCIIFoldingFilterFactory" />
+        <filter class="solr.LowerCaseFilterFactory" />
+        <filter class="solr.TrimFilterFactory" />
+      </analyzer>
+    </fieldType>
+
     <!-- This field is used for store metadatavalue (with authority, prefered label, variants and 
     	 language) to use in projection  -->
     <fieldType name="dspaceMetadataProjection" class="solr.TextField" sortMissingLast="true" omitNorms="true">
@@ -315,7 +324,7 @@
     <!--Dynamic field used for hit highlighting-->
     <dynamicField name="*_hl" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true"/>
 
-    <dynamicField name="*_sort" type="lowerCaseSort" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
+    <dynamicField name="*_sort" type="lowerCaseUnaccentedSort" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
     <dynamicField name="*_min" type="text" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
     <dynamicField name="*_max" type="text" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
 
