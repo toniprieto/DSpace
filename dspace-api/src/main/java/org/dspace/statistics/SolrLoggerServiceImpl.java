@@ -220,6 +220,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         try
         {
+            boolean isNoBitstream = false;
+            boolean isOriginalBundle = false;
             SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, request, currentUser);
             if (doc1 == null) return;
             if(dspaceObject instanceof Bitstream)
@@ -228,13 +230,20 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
                     doc1.addField("bundleName", bundle.getName());
+                    if ("original".equalsIgnoreCase(bundle.getName())) {
+                        isOriginalBundle = true;
+                    }
                 }
+            } else {
+                isNoBitstream = true;
             }
 
             doc1.addField("statistics_type", StatisticsType.VIEW.text());
 
-
-            solr.add(doc1);
+            // Només enviem events del Bundle Original o accesos a items
+            if (isNoBitstream || isOriginalBundle) {
+                solr.add(doc1);
+            }
             //commits are executed automatically using the solr autocommit
 //            solr.commit(false, false);
 
@@ -258,6 +267,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         initSolrYearCores();
 
 		try {
+			boolean isNoBitstream = false;
+			boolean isOriginalBundle = false;
 			SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, ip, userAgent, xforwardedfor,
 					currentUser);
 			if (doc1 == null)
@@ -267,12 +278,19 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 				List<Bundle> bundles = bit.getBundles();
 				for (Bundle bundle : bundles) {
 					doc1.addField("bundleName", bundle.getName());
+					if ("original".equalsIgnoreCase(bundle.getName())) {
+					    isOriginalBundle = true;
+					}
 				}
+			} else {
+			    isNoBitstream = true;
 			}
 
 			doc1.addField("statistics_type", StatisticsType.VIEW.text());
 
-			solr.add(doc1);
+			if (isNoBitstream || isOriginalBundle) {
+			    solr.add(doc1);
+			}
 			// commits are executed automatically using the solr autocommit
 			// solr.commit(false, false);
 
