@@ -26,6 +26,7 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.ValuePair;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
@@ -91,7 +92,8 @@ public class DescribeStep extends AbstractProcessingStep {
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
                     for (Object qualifier : input.getPairs()) {
-                        fieldsName.add(input.getFieldName() + "." + (String) qualifier);
+                        fieldsName.add(input.getFieldName() + "." + ((ValuePair) qualifier).getStored());
+                        fieldsName.add(input.getFieldName() + "." + ((ValuePair) qualifier).getDisplayed());
                     }
                 } else {
                     String fieldName = input.getFieldName();
@@ -183,7 +185,8 @@ public class DescribeStep extends AbstractProcessingStep {
             for (DCInput input : row) {
                 if (input.isQualdropValue()) {
                     for (Object qualifier : input.getPairs()) {
-                        fieldsName.add(input.getFieldName() + "." + (String) qualifier);
+                        fieldsName.add(input.getFieldName() + "." + ((ValuePair) qualifier).getStored());
+                        fieldsName.add(input.getFieldName() + "." + ((ValuePair) qualifier).getDisplayed());
                     }
                 } else if (StringUtils.equalsIgnoreCase(input.getInputType(), "group") ||
                         StringUtils.equalsIgnoreCase(input.getInputType(), "inline-group")) {

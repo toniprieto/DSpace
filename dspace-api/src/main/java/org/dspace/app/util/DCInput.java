@@ -8,6 +8,7 @@
 package org.dspace.app.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,12 +59,17 @@ public class DCInput {
     /**
      * the language list and their value
      */
-    private List<String> valueLanguageList = null;
+    private List<ValuePair> valueLanguageList = null;
 
     /**
      * a label describing input
      */
     private String label = null;
+
+    /**
+     * labels translations describing input
+     */
+    private HashMap<String, String> labelI18n = new HashMap<>();
 
     /**
      * a style instruction to apply to the input. The exact way to use the style value is UI depending that receive the
@@ -87,6 +93,11 @@ public class DCInput {
     private String warning = null;
 
     /**
+     * if required, translation text to display when missing
+     */
+    private HashMap<String, String> warningI18n = new HashMap<>();
+
+    /**
      * is input repeatable?
      */
     private boolean repeatable = false;
@@ -102,6 +113,11 @@ public class DCInput {
     private String hint = null;
 
     /**
+     * 'hint' text translations to display
+     */
+    private HashMap<String, String> hintI8n = new HashMap<>();
+
+    /**
      * if input list-controlled, name of list
      */
     private String valueListName = null;
@@ -109,7 +125,7 @@ public class DCInput {
     /**
      * if input list-controlled, the list itself
      */
-    private List<String> valueList = null;
+    private List<ValuePair> valueList = null;
 
     /**
      * if non-null, visibility scope restriction
@@ -172,7 +188,7 @@ public class DCInput {
      * @param fieldMap named field values.
      * @param listMap  value-pairs map, computed from the forms definition XML file
      */
-    public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap) {
+    public DCInput(Map<String, String> fieldMap, Map<String, List<ValuePair>> listMap, String currentLang) {
         dcElement = fieldMap.get("dc-element");
         dcQualifier = fieldMap.get("dc-qualifier");
 
@@ -242,6 +258,29 @@ public class DCInput {
             }
         }
 
+        // Add translations
+        if (currentLang != null) {
+            for (String fieldName : fieldMap.keySet()) {
+                if (fieldName.startsWith("label-")) {
+                    String lang = fieldName.replace("label-","");
+                    if (currentLang.equalsIgnoreCase(lang)) {
+                        label = fieldMap.get(fieldName);
+                    }
+                }
+                if (fieldName.startsWith("hint-")) {
+                    String lang = fieldName.replace("hint-","");
+                    if (currentLang.equalsIgnoreCase(lang)) {
+                        hint = fieldMap.get(fieldName);
+                    }
+                }
+                if (fieldName.startsWith("required-")) {
+                    String lang = fieldName.replace("required-","");
+                    if (currentLang.equalsIgnoreCase(lang)) {
+                        warning = fieldMap.get(fieldName);
+                    }
+                }
+            }
+        }
     }
 
     protected void initRegex(String regex) {
@@ -424,7 +463,7 @@ public class DCInput {
      *
      * @return the pairs type name
      */
-    public List getPairs() {
+    public List<ValuePair> getPairs() {
         return valueList;
     }
 
@@ -434,7 +473,7 @@ public class DCInput {
      * @return the list of language
      */
 
-    public List<String> getValueLanguageList() {
+    public List<ValuePair> getValueLanguageList() {
         return valueLanguageList;
     }
 
@@ -470,8 +509,8 @@ public class DCInput {
     public String getDisplayString(String pairTypeName, String storedString) {
         if (valueList != null && storedString != null) {
             for (int i = 0; i < valueList.size(); i += 2) {
-                if (storedString.equals(valueList.get(i + 1))) {
-                    return valueList.get(i);
+                if (storedString.equals(valueList.get(i + 1).getStored())) {
+                    return valueList.get(i).getDisplayed();
                 }
             }
         }
@@ -490,8 +529,8 @@ public class DCInput {
     public String getStoredString(String pairTypeName, String displayedString) {
         if (valueList != null && displayedString != null) {
             for (int i = 0; i < valueList.size(); i += 2) {
-                if (displayedString.equals(valueList.get(i))) {
-                    return valueList.get(i + 1);
+                if (displayedString.equals(valueList.get(i).getDisplayed())) {
+                    return valueList.get(i).getStored();
                 }
             }
         }

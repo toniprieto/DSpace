@@ -26,6 +26,10 @@ public class DCInputSet {
      */
     private String formName = null;
     /**
+     * locale used
+     */
+    private String language = null;
+    /**
      * the inputs ordered by row position
      */
     private DCInput[][] inputs = null;
@@ -37,7 +41,7 @@ public class DCInputSet {
      * @param rows           the rows
      * @param listMap        map
      */
-    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<String>> listMap) {
+    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<ValuePair>> listMap) {
         this.formName = formName;
         this.inputs = new DCInput[rows.size()][];
         for (int i = 0; i < inputs.length; i++) {
@@ -45,9 +49,32 @@ public class DCInputSet {
             inputs[i] = new DCInput[fields.size()];
             for (int j = 0; j < inputs[i].length; j++) {
                 Map<String, String> field = rows.get(i).get(j);
-                inputs[i][j] = new DCInput(field, listMap);
+                inputs[i][j] = new DCInput(field, listMap, null);
             }
         }
+        this.language = null;
+    }
+
+    /**
+     * constructor
+     *
+     * @param formName       form name
+     * @param rows           the rows
+     * @param listMap        map
+     */
+    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<ValuePair>> listMap,
+                      String lang) {
+        this.formName = formName;
+        this.inputs = new DCInput[rows.size()][];
+        for (int i = 0; i < inputs.length; i++) {
+            List<Map<String, String>> fields = rows.get(i);
+            inputs[i] = new DCInput[fields.size()];
+            for (int j = 0; j < inputs[i].length; j++) {
+                Map<String, String> field = rows.get(i).get(j);
+                inputs[i][j] = new DCInput(field, listMap, lang);
+            }
+        }
+        this.language = lang;
     }
 
     /**
@@ -57,6 +84,15 @@ public class DCInputSet {
      */
     public String getFormName() {
         return formName;
+    }
+
+    /**
+     * Return the language used to load the information
+     *
+     * @return language used
+     */
+    public String getLanguage() {
+        return language;
     }
 
     /**
@@ -111,9 +147,9 @@ public class DCInputSet {
                 DCInput field = inputs[i][j];
                 // If this is a "qualdrop_value" field, then the full field name is the field + dropdown qualifier
                 if (StringUtils.equals(field.getInputType(), "qualdrop_value")) {
-                    List<String> pairs = field.getPairs();
-                    for (int k = 0; k < pairs.size(); k += 2) {
-                        String qualifier = pairs.get(k + 1);
+                    List<ValuePair> pairs = field.getPairs();
+                    for (int k = 0; k < pairs.size(); k++) {
+                        String qualifier = pairs.get(k).getStored();
                         String fullName = Utils.standardize(field.getSchema(), field.getElement(), qualifier, ".");
                         if (fullName.equals(fieldName)) {
                             return true;
@@ -199,11 +235,11 @@ public class DCInputSet {
         for (DCInput[] row : inputs) {
             for (DCInput input : row) {
                 if (input.isQualdropValue()) {
-                    List<Object> inputPairs = input.getPairs();
+                    List<ValuePair> inputPairs = input.getPairs();
                     //starting from the second element of the list and skipping one every time because the display
                     // values are also in the list and before the stored values.
-                    for (int i = 1; i < inputPairs.size(); i += 2) {
-                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
+                    for (int i = 0; i < inputPairs.size(); i++) {
+                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i).getStored();
                         if (input.isAllowedFor(documentTypeValue)) {
                             if (!allowedFieldNames.contains(fullFieldname)) {
                                 allowedFieldNames.add(fullFieldname);

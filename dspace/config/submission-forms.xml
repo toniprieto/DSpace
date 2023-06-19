@@ -58,8 +58,12 @@
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Author</label>
+                    <label-i18n lang="es">Autor</label-i18n>
+                    <label-i18n lang="ca">Autor</label-i18n>
                     <input-type>onebox</input-type>
                     <hint>Enter the author's name (Family name, Given names).</hint>
+                    <hint-i18n lang="es">Introduce el nombre del autor (Apellidos, Nombre).</hint-i18n>
+                    <hint-i18n lang="ca">Introdueix el nom de l'autor (Cognoms, Nom).</hint-i18n>
                     <required></required>
                 </field>
             </row>
@@ -70,9 +74,15 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Title</label>
+                    <label-i18n lang="es">Título</label-i18n>
+                    <label-i18n lang="ca">Títol</label-i18n>
                     <input-type>onebox</input-type>
                     <hint>Enter the main title of the item.</hint>
-                    <required>You must enter a main title for this item.</required>
+                    <hint-i18n lang="es">Introduce el título del item.</hint-i18n>
+                    <hint-i18n lang="ca">Introdueix el títol de l'ítem.</hint-i18n>
+                    <required>You must enter a main title for this ítem.</required>
+                    <required-i18n lang="es">Debes introducir el título del ítem.</required-i18n>
+                    <required-i18n lang="ca">Has d'introduir el títol de l'ítem.</required-i18n>
                 </field>
             </row>
             <row>
@@ -82,8 +92,12 @@
                     <dc-qualifier>alternative</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Other Titles</label>
+                    <label-i18n lang="es">Otros Títulos</label-i18n>
+                    <label-i18n lang="ca">Altres Títols</label-i18n>
                     <input-type>onebox</input-type>
                     <hint>If the item has any alternative titles, please enter them here.</hint>
+                    <hint-i18n lang="es">Si el ítem tiene otros títulos alternativos, por favor introdúcelos aquí.</hint-i18n>
+                    <hint-i18n lang="ca">Si l'ítem té altres títols alternatius, introdueix-los aquí.</hint-i18n>
                     <required></required>
                 </field>
             </row>
@@ -94,23 +108,36 @@
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Date of Issue</label>
+                    <label-i18n lang="es">Fecha de publicación</label-i18n>
+                    <label-i18n lang="ca">Data de publicació</label-i18n>
                     <style>col-sm-4</style>
                     <input-type>date</input-type>
                     <hint>Please give the date of previous publication or public distribution.
                         You can leave out the day and/or month if they aren't applicable.
                     </hint>
+                    <hint-i18n lang="es">Por favor, indica la fecha de publicación o distribución pública anterior.
+                        Puedes omitir el día y/o mes si no corresponden.
+                    </hint-i18n>
+                    <hint-i18n lang="ca">Indica la data de publicació o distribució pública anterior.
+                        Pots ometre el dia i/o mes si no són aplicables.
+                    </hint-i18n>
                     <required>You must enter at least the year.</required>
+                    <required-i18n lang="es">Debes ingresar al menos el año.</required-i18n>
+                    <required-i18n lang="ca">Cal que introdueixis com a mínim l'any.</required-i18n>
                 </field>
-
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>publisher</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Publisher</label>
+                    <label-i18n lang="es">Editorial</label-i18n>
+                    <label-i18n lang="ca">Editorial</label-i18n>
                     <style>col-sm-8</style>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                    <hint-i18n lang="es">Introduce el nombre del editor de la instancia previamente publicada de este ítem.</hint-i18n>
+                    <hint-i18n lang="ca">Introdueix el nom de l'editor de la instància prèviament publicada d'aquest ítem.</hint-i18n>
                     <required></required>
                 </field>
             </row>
@@ -121,8 +148,12 @@
                     <dc-qualifier>citation</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Citation</label>
+                    <label-i18n lang="es">Cita</label-i18n>
+                    <label-i18n lang="ca">Citació</label-i18n>
                     <input-type>onebox</input-type>
                     <hint>Enter the standard citation for the previously issued instance of this item.</hint>
+                    <hint-i18n lang="es">Introduce la cita estándar de la instancia previamente publicada de este ítem.</hint-i18n>
+                    <hint-i18n lang="ca">Introdueix la citació estàndard de la instància prèviament publicada d'aquest ítem.</hint-i18n>
                     <required></required>
                 </field>
             </row>
@@ -133,8 +164,12 @@
                     <dc-qualifier>ispartofseries</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Series/Report No.</label>
+                    <label-i18n lang="es">Serie/Reporte Número</label-i18n>
+                    <label-i18n lang="ca">Sèrie/Informe Núm.</label-i18n>
                     <input-type>series</input-type>
                     <hint>Enter the series and number assigned to this item by your community.</hint>
+                    <hint-i18n lang="es">Introduce la serie y el número asignado a este ítem por tu comunidad.</hint-i18n>
+                    <hint-i18n lang="ca">Introdueix la sèrie i el número assignat a aquest ítem per la teva comunitat.</hint-i18n>
                     <required></required>
                 </field>
             </row>
@@ -146,10 +181,18 @@
                     <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
                     <label>Identifiers</label>
+                    <label-i18n lang="es">Identificadores</label-i18n>
+                    <label-i18n lang="ca">Identificadors</label-i18n>
                     <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
                     <hint>If the item has any identification numbers or codes associated with
                         it, please enter the types and the actual numbers or codes.
                     </hint>
+                    <hint-i18n lang="es">Si el ítem tiene números o códigos de identificación asociados,
+                        por favor ingresa los tipos y los números o códigos reales.
+                    </hint-i18n>
+                    <hint-i18n lang="ca">Si l'ítem té números o codis d'identificació associats,
+                        si us plau, introdueix els tipus i els números o codis reals.
+                    </hint-i18n>
                     <required></required>
                 </field>
             </row>
@@ -160,9 +203,12 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Type</label>
+                    <label-i18n lang="es">Tipo</label-i18n>
+                    <label-i18n lang="ca">Tipus</label-i18n>
                     <input-type value-pairs-name="common_types">dropdown</input-type>
-                    <hint>Select the type of content of the item.
-                    </hint>
+                    <hint>Select the type of content of the item.</hint>
+                    <hint-i18n lang="es">Selecciona el tipo de contenido del ítem.</hint-i18n>
+                    <hint-i18n lang="ca">Selecciona el tipus de contingut de l'ítem.</hint-i18n>
                     <required></required>
                 </field>
             </row>
@@ -173,15 +219,27 @@
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Language</label>
+                    <label-i18n lang="es">Idioma</label-i18n>
+                    <label-i18n lang="ca">Idioma</label-i18n>
                     <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
                     <hint>Select the language of the main content of the item. If the language does not appear in the
                         list, please select 'Other'. If the content does not really have a language (for example, if it
                         is a dataset or an image) please select 'N/A'.
                     </hint>
+                    <hint-i18n lang="es">Selecciona el idioma del contenido principal del ítem. Si el idioma no aparece
+                        en la lista, por favor selecciona 'Otros'. Si el contenido realmente no tiene un idioma (por ejemplo,
+                        si es un conjunto de datos o una imagen) selecciona 'N/A'.
+                    </hint-i18n>
+                    <hint-i18n lang="ca">Selecciona l'idioma del contingut principal de l'ítem. Si l'idioma no apareix
+                        a la llista, selecciona 'Altres'. Si el contingut no té realment un idioma (per exemple, si és un
+                        conjunt de dades o una imatge) selecciona 'N/A'.
+                    </hint-i18n>
                     <required></required>
                 </field>
             </row>
         </form>
+
+
 
         <!-- Form which defines the second page/section of the "traditional" DSpace submission process,
              often used when depositing normal Items. -->
@@ -1368,26 +1426,38 @@
         <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
             <pair>
                 <displayed-value>ISSN</displayed-value>
+                <displayed-value-i18n lang="es">ISSN</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">ISSN</displayed-value-i18n>
                 <stored-value>issn</stored-value>
             </pair>
             <pair>
                 <displayed-value>Other</displayed-value>
+                <displayed-value-i18n lang="es">Otro</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Altres</displayed-value-i18n>
                 <stored-value>other</stored-value>
             </pair>
             <pair>
                 <displayed-value>ISMN</displayed-value>
+                <displayed-value-i18n lang="es">ISMN</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">ISMN</displayed-value-i18n>
                 <stored-value>ismn</stored-value>
             </pair>
             <pair>
                 <displayed-value>Gov't Doc #</displayed-value>
+                <displayed-value-i18n lang="es">Núm. doc. oficial</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Núm. doc. oficial</displayed-value-i18n>
                 <stored-value>govdoc</stored-value>
             </pair>
             <pair>
                 <displayed-value>URI</displayed-value>
+                <displayed-value-i18n lang="es">URI</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">URI</displayed-value-i18n>
                 <stored-value>uri</stored-value>
             </pair>
             <pair>
                 <displayed-value>ISBN</displayed-value>
+                <displayed-value-i18n lang="es">ISBN</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">ISBN</displayed-value-i18n>
                 <stored-value>isbn</stored-value>
             </pair>
         </value-pairs>
@@ -1395,93 +1465,138 @@
         <value-pairs value-pairs-name="common_types" dc-term="type">
             <pair>
                 <displayed-value>Animation</displayed-value>
+                <displayed-value-i18n lang="es">Animación</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Animació</displayed-value-i18n>
                 <stored-value>Animation</stored-value>
             </pair>
             <pair>
                 <displayed-value>Article</displayed-value>
+                <displayed-value-i18n lang="es">Artículo</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Article</displayed-value-i18n>
                 <stored-value>Article</stored-value>
             </pair>
             <pair>
                 <displayed-value>Book</displayed-value>
+                <displayed-value-i18n lang="es">Libro</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Llibre</displayed-value-i18n>
                 <stored-value>Book</stored-value>
             </pair>
             <pair>
                 <displayed-value>Book chapter</displayed-value>
+                <displayed-value-i18n lang="es">Capítulo de libro</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Capítol de llibre</displayed-value-i18n>
                 <stored-value>Book chapter</stored-value>
             </pair>
             <pair>
                 <displayed-value>Dataset</displayed-value>
+                <displayed-value-i18n lang="es">Conjunto de datos</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Conjunt de dades</displayed-value-i18n>
                 <stored-value>Dataset</stored-value>
             </pair>
             <pair>
                 <displayed-value>Learning Object</displayed-value>
+                <displayed-value-i18n lang="es">Objeto de aprendizaje</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Objecte d'aprenentatge</displayed-value-i18n>
                 <stored-value>Learning Object</stored-value>
             </pair>
             <pair>
                 <displayed-value>Image</displayed-value>
+                <displayed-value-i18n lang="es">Imagen</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Imatge</displayed-value-i18n>
                 <stored-value>Image</stored-value>
             </pair>
             <pair>
                 <displayed-value>Image, 3-D</displayed-value>
+                <displayed-value-i18n lang="es">Imagen 3D</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Imatge 3D</displayed-value-i18n>
                 <stored-value>Image, 3-D</stored-value>
             </pair>
             <pair>
                 <displayed-value>Map</displayed-value>
+                <displayed-value-i18n lang="es">Mapa</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Mapa</displayed-value-i18n>
                 <stored-value>Map</stored-value>
             </pair>
             <pair>
                 <displayed-value>Musical Score</displayed-value>
+                <displayed-value-i18n lang="es">Partitura musical</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Partitura musical</displayed-value-i18n>
                 <stored-value>Musical Score</stored-value>
             </pair>
             <pair>
                 <displayed-value>Plan or blueprint</displayed-value>
+                <displayed-value-i18n lang="es">Plan o blueprint</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Pla o blueprint</displayed-value-i18n>
                 <stored-value>Plan or blueprint</stored-value>
             </pair>
             <pair>
                 <displayed-value>Preprint</displayed-value>
+                <displayed-value-i18n lang="es">Preimpreso</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Preimprès</displayed-value-i18n>
                 <stored-value>Preprint</stored-value>
             </pair>
             <pair>
                 <displayed-value>Presentation</displayed-value>
+                <displayed-value-i18n lang="es">Presentación</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Presentació</displayed-value-i18n>
                 <stored-value>Presentation</stored-value>
             </pair>
             <pair>
                 <displayed-value>Recording, acoustical</displayed-value>
+                <displayed-value-i18n lang="es">Grabación acústica</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Enregistrament acústic</displayed-value-i18n>
                 <stored-value>Recording, acoustical</stored-value>
             </pair>
             <pair>
                 <displayed-value>Recording, musical</displayed-value>
+                <displayed-value-i18n lang="es">Grabación musical</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Enregistrament musical</displayed-value-i18n>
                 <stored-value>Recording, musical</stored-value>
             </pair>
             <pair>
                 <displayed-value>Recording, oral</displayed-value>
+                <displayed-value-i18n lang="es">Grabación oral</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Enregistrament oral</displayed-value-i18n>
                 <stored-value>Recording, oral</stored-value>
             </pair>
             <pair>
                 <displayed-value>Software</displayed-value>
+                <displayed-value-i18n lang="es">Software</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Programari</displayed-value-i18n>
                 <stored-value>Software</stored-value>
             </pair>
             <pair>
                 <displayed-value>Technical Report</displayed-value>
+                <displayed-value-i18n lang="es">Informe técnico</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Informe tècnic</displayed-value-i18n>
                 <stored-value>Technical Report</stored-value>
             </pair>
             <pair>
                 <displayed-value>Thesis</displayed-value>
+                <displayed-value-i18n lang="es">Tesis</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Tesi</displayed-value-i18n>
                 <stored-value>Thesis</stored-value>
             </pair>
             <pair>
                 <displayed-value>Video</displayed-value>
+                <displayed-value-i18n lang="es">Video</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Vídeo</displayed-value-i18n>
                 <stored-value>Video</stored-value>
             </pair>
             <pair>
                 <displayed-value>Working Paper</displayed-value>
+                <displayed-value-i18n lang="es">Documento de trabajo</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Document de treball</displayed-value-i18n>
                 <stored-value>Working Paper</stored-value>
             </pair>
             <pair>
                 <displayed-value>Other</displayed-value>
+                <displayed-value-i18n lang="es">Otros</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Altres</displayed-value-i18n>
                 <stored-value>Other</stored-value>
             </pair>
         </value-pairs>
+
 
         <!-- default language order: (from dspace 1.2.1)
              "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
@@ -1489,50 +1604,74 @@
         <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
             <pair>
                 <displayed-value>N/A</displayed-value>
+                <displayed-value-i18n lang="es">N/D</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">N/D</displayed-value-i18n>
                 <stored-value></stored-value>
             </pair>
             <pair>
                 <displayed-value>English (United States)</displayed-value>
+                <displayed-value-i18n lang="es">Inglés (Estados Unidos)</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Anglès (Estats Units)</displayed-value-i18n>
                 <stored-value>en_US</stored-value>
             </pair>
             <pair>
                 <displayed-value>English</displayed-value>
+                <displayed-value-i18n lang="es">Inglés</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Anglès</displayed-value-i18n>
                 <stored-value>en</stored-value>
             </pair>
             <pair>
                 <displayed-value>Spanish</displayed-value>
+                <displayed-value-i18n lang="es">Español</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Espanyol</displayed-value-i18n>
                 <stored-value>es</stored-value>
             </pair>
             <pair>
                 <displayed-value>German</displayed-value>
+                <displayed-value-i18n lang="es">Alemán</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Alemany</displayed-value-i18n>
                 <stored-value>de</stored-value>
             </pair>
             <pair>
                 <displayed-value>French</displayed-value>
+                <displayed-value-i18n lang="es">Francés</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Francès</displayed-value-i18n>
                 <stored-value>fr</stored-value>
             </pair>
             <pair>
                 <displayed-value>Italian</displayed-value>
+                <displayed-value-i18n lang="es">Italiano</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Italià</displayed-value-i18n>
                 <stored-value>it</stored-value>
             </pair>
             <pair>
                 <displayed-value>Japanese</displayed-value>
+                <displayed-value-i18n lang="es">Japonés</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Japonès</displayed-value-i18n>
                 <stored-value>ja</stored-value>
             </pair>
             <pair>
                 <displayed-value>Chinese</displayed-value>
+                <displayed-value-i18n lang="es">Chino</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Xinès</displayed-value-i18n>
                 <stored-value>zh</stored-value>
             </pair>
             <pair>
                 <displayed-value>Portuguese</displayed-value>
+                <displayed-value-i18n lang="es">Portugués</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Portuguès</displayed-value-i18n>
                 <stored-value>pt</stored-value>
             </pair>
             <pair>
                 <displayed-value>Turkish</displayed-value>
+                <displayed-value-i18n lang="es">Turco</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Turc</displayed-value-i18n>
                 <stored-value>tr</stored-value>
             </pair>
             <pair>
                 <displayed-value>(Other)</displayed-value>
+                <displayed-value-i18n lang="es">(Otro)</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">(altres)</displayed-value-i18n>
                 <stored-value>other</stored-value>
             </pair>
         </value-pairs>

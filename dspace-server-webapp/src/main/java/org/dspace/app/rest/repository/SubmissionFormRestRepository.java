@@ -51,7 +51,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
             if (inputReader == null) {
                 inputReader = defaultInputReader;
             }
-            DCInputSet subConfs = inputReader.getInputsByFormName(submitName);
+            DCInputSet subConfs = inputReader.getInputsByFormName(submitName, currentLocale);
             if (subConfs == null) {
                 return null;
             }

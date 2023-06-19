@@ -21,6 +21,7 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.ValuePair;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
@@ -81,11 +82,11 @@ public class MetadataValidation extends AbstractValidation {
 
                 if (input.isQualdropValue()) {
                     boolean foundResult = false;
-                    List<Object> inputPairs = input.getPairs();
+                    List<ValuePair> inputPairs = input.getPairs();
                     //starting from the second element of the list and skipping one every time because the display
                     // values are also in the list and before the stored values.
-                    for (int i = 1; i < inputPairs.size(); i += 2) {
-                        String fullFieldname = input.getFieldName() + "." + (String) inputPairs.get(i);
+                    for (int i = 0; i < inputPairs.size(); i++) {
+                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i).getStored();
                         List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fullFieldname);
 
                         // Check the lookup list. If no other inputs of the same field name allow this type,

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
@@ -80,7 +81,7 @@ public class DCInputsReader {
     /**
      * Reference to the value-pairs map, computed from the forms definition file
      */
-    private Map<String, List<String>> valuePairs = null;    // Holds display/storage pairs
+    private Map<String, List<ValuePair>> valuePairs = null;    // Holds display/storage pairs
 
     /**
      * Mini-cache of last DCInputSet requested. If submissions are not typically
@@ -117,7 +118,7 @@ public class DCInputsReader {
     private void buildInputs(String fileName)
         throws DCInputsReaderException {
         formDefns = new HashMap<String, List<List<Map<String, String>>>>();
-        valuePairs = new HashMap<String, List<String>>();
+        valuePairs = new HashMap<String, List<ValuePair>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -142,7 +143,7 @@ public class DCInputsReader {
         return valuePairs.keySet().iterator();
     }
 
-    public List<String> getPairs(String name) {
+    public List<ValuePair> getPairs(String name) {
         return valuePairs.get(name);
     }
 
@@ -211,7 +212,8 @@ public class DCInputsReader {
     public DCInputSet getInputsByFormName(String formName)
         throws DCInputsReaderException {
         // check mini-cache, and return if match
-        if (lastInputSet != null && lastInputSet.getFormName().equals(formName)) {
+        if (lastInputSet != null && lastInputSet.getFormName().equals(formName) &&
+            lastInputSet.getLanguage() == null) {
             return lastInputSet;
         }
         // cache miss - construct new DCInputSet
@@ -221,6 +223,32 @@ public class DCInputsReader {
         }
         lastInputSet = new DCInputSet(formName,
                                       pages, valuePairs);
+        return lastInputSet;
+    }
+
+    /**
+     * Returns the set of DC inputs used for a particular input form
+     *
+     * @param formName input form unique name
+     * @param locale current locale used
+     * @return DC input set
+     * @throws DCInputsReaderException if not found
+     */
+    public DCInputSet getInputsByFormName(String formName, Locale locale)
+        throws DCInputsReaderException {
+        // check mini-cache, and return if match
+        if (lastInputSet != null && lastInputSet.getFormName().equals(formName) &&
+            locale.getLanguage().equals(lastInputSet.getLanguage())) {
+            return lastInputSet;
+        }
+        // cache miss - construct new DCInputSet
+        List<List<Map<String, String>>> pages = formDefns.get(formName);
+        if (pages == null) {
+            throw new DCInputsReaderException("Missing the " + formName + " form");
+        }
+        lastInputSet = new DCInputSet(formName,
+            pages, valuePairs, locale.getLanguage());
+
         return lastInputSet;
     }
 
@@ -404,6 +432,15 @@ public class DCInputsReader {
                 field.put(tagName, value);
                 if (tagName.equals("input-type")) {
                     handleInputTypeTagName(formName, field, nd, value);
+                } else if (tagName.equals("label-i18n")) {
+                    String lang = getAttribute(nd, "lang");
+                    field.put("label-" + lang, value);
+                } else if (tagName.equals("hint-i18n")) {
+                    String lang = getAttribute(nd, "lang");
+                    field.put("hint-" + lang, value);
+                } else if (tagName.equals("required-i18n")) {
+                    String lang = getAttribute(nd, "lang");
+                    field.put("required-" + lang, value);
                 } else if (tagName.equals("vocabulary")) {
                     String closedVocabularyString = getAttribute(nd, "closed");
                     field.put("closedVocabulary", closedVocabularyString);
@@ -556,7 +593,7 @@ public class DCInputsReader {
                         "Missing name attribute for value-pairs for DC term " + dcTerm;
                     throw new SAXException(errString);
                 }
-                List<String> pairs = new ArrayList<String>();
+                List<ValuePair> pairs = new ArrayList<ValuePair>();
                 valuePairs.put(pairsName, pairs);
                 NodeList cl = nd.getChildNodes();
                 int lench = cl.getLength();
@@ -564,6 +601,7 @@ public class DCInputsReader {
                     Node nch = cl.item(j);
                     String display = null;
                     String storage = null;
+                    HashMap<String, String> translations = new HashMap<>();
 
                     if (nch.getNodeName().equals("pair")) {
                         NodeList pl = nch.getChildNodes();
@@ -578,10 +616,14 @@ public class DCInputsReader {
                                 if (storage == null) {
                                     storage = "";
                                 }
+                            } else if (vName.equals("displayed-value-i18n")) {
+                                String lang = getAttribute(vn, "lang");
+                                translations.put(lang, getValue(vn));
                             } // ignore any children that aren't 'display' or 'storage'
                         }
-                        pairs.add(display);
-                        pairs.add(storage);
+                        ValuePair pair = new ValuePair(storage, display);
+                        pair.setDisplayedTranslations(translations);
+                        pairs.add(pair);
                     } // ignore any children that aren't a 'pair'
                 }
             } // ignore any children that aren't a 'value-pair'
@@ -613,7 +655,7 @@ public class DCInputsReader {
                         || type.equals("qualdrop_value")
                         || type.equals("list"))) {
                         String pairsName = fld.get(PAIR_TYPE_NAME);
-                        List<String> v = valuePairs.get(pairsName);
+                        List<ValuePair> v = valuePairs.get(pairsName);
                         if (v == null) {
                             String errString = "Cannot find value pairs for " + pairsName;
                             throw new DCInputsReaderException(errString);

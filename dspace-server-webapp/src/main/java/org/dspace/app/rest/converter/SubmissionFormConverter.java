@@ -27,6 +27,7 @@ import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.app.util.ValuePair;
 import org.dspace.submit.model.LanguageFormField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,12 +58,12 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         sd.setProjection(projection);
         sd.setName(obj.getFormName());
         DCInput[][] step = obj.getFields();
-        List<SubmissionFormRowRest> rows = getPage(step, obj.getFormName());
+        List<SubmissionFormRowRest> rows = getPage(step, obj.getFormName(), obj.getLanguage());
         sd.setRows(rows);
         return sd;
     }
 
-    private List<SubmissionFormRowRest> getPage(DCInput[][] page, String formName) {
+    private List<SubmissionFormRowRest> getPage(DCInput[][] page, String formName, String locale) {
         List<SubmissionFormRowRest> rows = new LinkedList<SubmissionFormRowRest>();
 
         for (DCInput[] row : page) {
@@ -71,13 +72,13 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             rowRest.setFields(fields);
             rows.add(rowRest);
             for (DCInput dcinput : row) {
-                fields.add(getField(dcinput, formName));
+                fields.add(getField(dcinput, formName, locale));
             }
         }
         return rows;
     }
 
-    private SubmissionFormFieldRest getField(DCInput dcinput, String formName) {
+    private SubmissionFormFieldRest getField(DCInput dcinput, String formName, String locale) {
         SubmissionFormFieldRest inputField = new SubmissionFormFieldRest();
         List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
         SelectableRelationship selectableRelationship;
@@ -94,13 +95,10 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         if (dcinput.getLanguage()) {
             int idx = 1;
             //list contains: at even position the code, at odd position the label
-            for (String code : dcinput.getValueLanguageList()) {
+            for (ValuePair pair : dcinput.getValueLanguageList()) {
                 //check and retrieve "even/odd" couple to build the dto with "code/display" values
-                if (idx % 2 == 0) {
-                    String display = dcinput.getValueLanguageList().get(idx - 2);
-                    LanguageFormField lang = new LanguageFormField(code, display);
-                    inputField.getLanguageCodes().add(lang);
-                }
+                LanguageFormField lang = new LanguageFormField(pair.getStored(), pair.getDisplayed());
+                inputField.getLanguageCodes().add(lang);
                 idx++;
             }
         }
@@ -135,15 +133,15 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             } else {
                 // if the field is a qualdrop_value
                 inputRest.setType(INPUT_TYPE_ONEBOX);
-                List<String> pairs = dcinput.getPairs();
-                for (int idx = 0; idx < pairs.size(); idx += 2) {
+                List<ValuePair> pairs = dcinput.getPairs();
+                for (int idx = 0; idx < pairs.size(); idx++) {
                     SelectableMetadata selMd = new SelectableMetadata();
-                    selMd.setLabel((String) pairs.get(idx));
+                    selMd.setLabel(pairs.get(idx).getDisplayedTranslation(locale));
                     selMd.setMetadata(org.dspace.core.Utils
-                            .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
+                            .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx).getStored(), "."));
                     if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
                         selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-                                pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary()));
+                                pairs.get(idx).getStored(), dcinput.getPairsType(), dcinput.getVocabulary()));
                         selMd.setClosed(isClosed(dcinput.getSchema(), dcinput.getElement(),
                                 dcinput.getQualifier(), null, dcinput.getVocabulary(), dcinput.isClosedVocabulary()));
                     }

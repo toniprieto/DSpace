@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.ValuePair;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.SelfNamedPlugin;
 
@@ -126,13 +127,13 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             String pname = this.getPluginInstanceName();
             for (Locale l : dcis.keySet()) {
                 DCInputsReader dci = dcis.get(l);
-                List<String> pairs = dci.getPairs(pname);
+                List<ValuePair> pairs = dci.getPairs(pname);
                 if (pairs != null) {
-                    String[] valuesLocale = new String[pairs.size() / 2];
-                    String[]labelsLocale = new String[pairs.size() / 2];
-                    for (int i = 0; i < pairs.size(); i += 2) {
-                        labelsLocale[i / 2] = pairs.get(i);
-                        valuesLocale[i / 2] = pairs.get(i + 1);
+                    String[] valuesLocale = new String[pairs.size()];
+                    String[] labelsLocale = new String[pairs.size()];
+                    for (int i = 0; i < pairs.size(); i++) {
+                        labelsLocale[i] = pairs.get(i).getDisplayedTranslation(l.getLanguage());
+                        valuesLocale[i] = pairs.get(i).getStored();
                     }
                     values.put(l.getLanguage(), valuesLocale);
                     labels.put(l.getLanguage(), labelsLocale);
