@@ -8,7 +8,6 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
