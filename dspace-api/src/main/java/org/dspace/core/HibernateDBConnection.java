@@ -337,4 +337,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
             }
         }
     }
+
+    public boolean isSessionDirty() throws SQLException {
+        return getSession().isDirty();
+    }
 }

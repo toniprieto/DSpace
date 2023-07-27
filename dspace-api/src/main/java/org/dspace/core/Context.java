@@ -951,4 +951,8 @@ public class Context implements AutoCloseable {
     public boolean isContextUserSwitched() {
         return currentUserPreviousState != null;
     }
+
+    public boolean isSessionDirty() throws SQLException {
+        return dbConnection.isSessionDirty();
+    }
 }

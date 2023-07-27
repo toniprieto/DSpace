@@ -202,12 +202,18 @@ public class IndexEventConsumer implements Consumer {
     public void end(Context ctx) throws Exception {
 
         // Change the mode to readonly to improve performance
-        Context.Mode originalMode = ctx.getCurrentMode();
-        ctx.setMode(Context.Mode.READ_ONLY);
+        Context.Mode originalMode = null;
+        boolean switchMode = false;
+        if (!ctx.isSessionDirty()) {
+            originalMode = ctx.getCurrentMode();
+            ctx.setMode(Context.Mode.READ_ONLY);
+            switchMode = true;
+        }
 
         try {
             for (String uid : uniqueIdsToDelete) {
                 try {
+                    log.info("UNINDEX " + uid);
                     indexer.unIndexContent(ctx, uid, false);
                     if (log.isDebugEnabled()) {
                         log.debug("UN-Indexed Item, handle=" + uid);
@@ -234,9 +240,11 @@ public class IndexEventConsumer implements Consumer {
                 uniqueIdsToDelete.clear();
                 createdItemsToUpdate.clear();
             }
-        }
 
-        ctx.setMode(originalMode);
+            if (switchMode) {
+                ctx.setMode(originalMode);
+            }
+        }
     }
 
     private void indexObject(Context ctx, IndexableObject iu, boolean preDb) throws SQLException {
