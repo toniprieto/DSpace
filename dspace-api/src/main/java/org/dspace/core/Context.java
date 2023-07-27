@@ -447,6 +447,10 @@ public class Context implements AutoCloseable {
     }
 
 
+    public void flushChanges() throws SQLException {
+        dbConnection.flushChanges();
+    }
+
     /**
      * Dispatch any events (cached in current Context) to configured EventListeners (consumers)
      * in the EventService. This should be called prior to any commit as some consumers may add
@@ -880,6 +884,17 @@ public class Context implements AutoCloseable {
         dbConnection.uncacheEntity(entity);
     }
 
+    /**
+     * Return true if the database session contains any changes which must be synchronized
+     * with the database
+     *
+     * @return true if the database session has unsaved changes (dirty)
+     * @throws SQLException when call to isDirtt
+     */
+    public boolean isDBSessionDirty() throws SQLException {
+        return dbConnection.isSessionDirty();
+    }
+
     public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
         if (isReadOnly()) {
             return readOnlyCache.getCachedAuthorizationResult(dspaceObject, action, eperson);
@@ -952,7 +967,4 @@ public class Context implements AutoCloseable {
         return currentUserPreviousState != null;
     }
 
-    public boolean isSessionDirty() throws SQLException {
-        return dbConnection.isSessionDirty();
-    }
 }

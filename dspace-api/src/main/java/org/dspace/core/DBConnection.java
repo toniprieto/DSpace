@@ -72,6 +72,8 @@ public interface DBConnection<T> {
      */
     public void shutdown();
 
+    void flushChanges() throws SQLException;
+
     /**
      * Some description of the DBMS used to persist entities.
      *
@@ -149,5 +151,12 @@ public interface DBConnection<T> {
      */
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException;
 
+    /**
+     * Return true if the session contains any changes which must be synchronized
+     * with the database
+     *
+     * @return true if the database session has unsaved changes (dirty)
+     * @throws SQLException passed through.
+     */
     public boolean isSessionDirty() throws SQLException;
 }

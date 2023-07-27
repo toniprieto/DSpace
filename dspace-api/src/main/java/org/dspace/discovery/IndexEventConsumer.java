@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -202,18 +203,19 @@ public class IndexEventConsumer implements Consumer {
     public void end(Context ctx) throws Exception {
 
         // Change the mode to readonly to improve performance
-        Context.Mode originalMode = null;
-        boolean switchMode = false;
-        if (!ctx.isSessionDirty()) {
-            originalMode = ctx.getCurrentMode();
-            ctx.setMode(Context.Mode.READ_ONLY);
-            switchMode = true;
-        }
+        // if the database session not has unsaved changes
+        long now = new Date().getTime();
+        //boolean switchMode = false;
+        log.info("CANVI DIRTY " + ctx.isDBSessionDirty());
+        Context.Mode originalMode = ctx.getCurrentMode();
+        ctx.flushChanges();
+        ctx.setMode(Context.Mode.READ_ONLY);
+        long now2 = new Date().getTime();
+        log.info("CANVI Canvi a readonly: " + (now2 - now));
 
         try {
             for (String uid : uniqueIdsToDelete) {
                 try {
-                    log.info("UNINDEX " + uid);
                     indexer.unIndexContent(ctx, uid, false);
                     if (log.isDebugEnabled()) {
                         log.debug("UN-Indexed Item, handle=" + uid);
@@ -241,9 +243,7 @@ public class IndexEventConsumer implements Consumer {
                 createdItemsToUpdate.clear();
             }
 
-            if (switchMode) {
-                ctx.setMode(originalMode);
-            }
+            ctx.setMode(originalMode);
         }
     }
 
