@@ -204,14 +204,9 @@ public class IndexEventConsumer implements Consumer {
 
         // Change the mode to readonly to improve performance
         // if the database session not has unsaved changes
-        long now = new Date().getTime();
-        //boolean switchMode = false;
-        log.info("CANVI DIRTY " + ctx.isDBSessionDirty());
         Context.Mode originalMode = ctx.getCurrentMode();
-        ctx.flushChanges();
+        ctx.flushDBChanges();
         ctx.setMode(Context.Mode.READ_ONLY);
-        long now2 = new Date().getTime();
-        log.info("CANVI Canvi a readonly: " + (now2 - now));
 
         try {
             for (String uid : uniqueIdsToDelete) {

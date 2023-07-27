@@ -447,7 +447,7 @@ public class Context implements AutoCloseable {
     }
 
 
-    public void flushChanges() throws SQLException {
+    public void flushDBChanges() throws SQLException {
         dbConnection.flushChanges();
     }
 
@@ -882,17 +882,6 @@ public class Context implements AutoCloseable {
     @SuppressWarnings("unchecked")
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
         dbConnection.uncacheEntity(entity);
-    }
-
-    /**
-     * Return true if the database session contains any changes which must be synchronized
-     * with the database
-     *
-     * @return true if the database session has unsaved changes (dirty)
-     * @throws SQLException when call to isDirtt
-     */
-    public boolean isDBSessionDirty() throws SQLException {
-        return dbConnection.isSessionDirty();
     }
 
     public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {

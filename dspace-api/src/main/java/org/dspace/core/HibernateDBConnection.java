@@ -171,7 +171,9 @@ public class HibernateDBConnection implements DBConnection<Session> {
     public void flushChanges() throws SQLException {
 
         // Flush synchronizes the database with in-memory objects in Session (and frees up that memory)
-        getSession().flush();
+        if (getSession().isDirty()) {
+            getSession().flush();
+        }
     }
 
     @Override
@@ -345,15 +347,4 @@ public class HibernateDBConnection implements DBConnection<Session> {
         }
     }
 
-    /**
-     * Return true if the session contains any changes which must be synchronized
-     * with the database
-     *
-     * @return true if the database session has unsaved changes (dirty)
-     * @throws SQLException passed through.
-     */
-    @Override
-    public boolean isSessionDirty() throws SQLException {
-        return getSession().isDirty();
-    }
 }
