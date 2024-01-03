@@ -31,6 +31,8 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 
     private List<CollectionRest> collections;
 
+    private List<CommunityRest> communities;
+
     @Override
     public String getId() {
         return name;
@@ -85,5 +87,15 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 
     public void setCollections(List<CollectionRest> collections) {
         this.collections = collections;
+    }
+
+    @LinkRest
+    @JsonIgnore
+    public List<CommunityRest> getCommunities() {
+        return communities;
+    }
+
+    public void setCommunities(List<CommunityRest> communities) {
+        this.communities = communities;
     }
 }

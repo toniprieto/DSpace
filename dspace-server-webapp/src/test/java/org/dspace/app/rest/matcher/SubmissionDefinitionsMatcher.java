@@ -35,6 +35,7 @@ public class SubmissionDefinitionsMatcher {
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
                 "collections[]",
+                "communities[]",
                 "sections"
         );
     }
@@ -45,6 +46,7 @@ public class SubmissionDefinitionsMatcher {
     public static Matcher<? super Object> matchLinks() {
         return HalMatcher.matchLinks(REST_SERVER_URL + "config/submissiondefinitions/traditional",
                 "collections",
+                "communities",
                 "sections",
                 "self"
         );

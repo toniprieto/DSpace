@@ -14,6 +14,7 @@ import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.core.Context;
 
 /**
@@ -34,7 +35,7 @@ public interface SubmissionConfigService {
 
     public int countSubmissionConfigs();
 
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle);
+    public SubmissionConfig getSubmissionConfigByCollection(Collection collection);
 
     public SubmissionConfig getSubmissionConfigByName(String submitName);
 
@@ -43,5 +44,8 @@ public interface SubmissionConfigService {
 
     public List<Collection> getCollectionsBySubmissionConfig(Context context, String submitName)
             throws IllegalStateException, SQLException, SubmissionConfigReaderException;
+
+    public List<Community> getCommunitiesBySubmissionConfig(Context context, String submitName)
+        throws IllegalStateException, SQLException, SubmissionConfigReaderException;
 
 }

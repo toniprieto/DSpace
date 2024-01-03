@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
@@ -24,6 +25,7 @@ import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +89,15 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
             List<CollectionRest> collectionsRest = collections.stream().map((collection) ->
                     cc.convert(collection, projection)).collect(Collectors.toList());
             sd.setCollections(collectionsRest);
+
+            List<Community> communities = panelConverter.getSubmissionConfigService()
+                .getCommunitiesBySubmissionConfig(context,
+                    obj.getSubmissionName());
+            DSpaceConverter<Community,CommunityRest> ccom = converter.getConverter(Community.class);
+            List<CommunityRest> communitiesRest = communities.stream().map((community) ->
+                ccom.convert(community, projection)).collect(Collectors.toList());
+            sd.setCommunities(communitiesRest);
+
         } catch (SQLException | IllegalStateException | SubmissionConfigReaderException e) {
             log.error(e.getMessage(), e);
         }

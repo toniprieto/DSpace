@@ -15,6 +15,7 @@ import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -57,8 +58,8 @@ public class SubmissionConfigServiceImpl implements SubmissionConfigService, Ini
     }
 
     @Override
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
-        return submissionConfigReader.getSubmissionConfigByCollection(collectionHandle);
+    public SubmissionConfig getSubmissionConfigByCollection(Collection collection) {
+        return submissionConfigReader.getSubmissionConfigByCollection(collection);
     }
 
     @Override
@@ -75,6 +76,12 @@ public class SubmissionConfigServiceImpl implements SubmissionConfigService, Ini
     public List<Collection> getCollectionsBySubmissionConfig(Context context, String submitName)
             throws IllegalStateException, SQLException {
         return submissionConfigReader.getCollectionsBySubmissionConfig(context, submitName);
+    }
+
+    @Override
+    public List<Community> getCommunitiesBySubmissionConfig(Context context, String submitName)
+        throws IllegalStateException, SQLException {
+        return submissionConfigReader.getCommunitiesBySubmissionConfig(context, submitName);
     }
 
 }
