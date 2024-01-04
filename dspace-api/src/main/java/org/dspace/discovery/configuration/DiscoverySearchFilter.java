@@ -64,6 +64,8 @@ public class DiscoverySearchFilter {
             this.type = DiscoveryConfigurationParameters.TYPE_TEXT;
         } else if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_DATE)) {
             this.type = DiscoveryConfigurationParameters.TYPE_DATE;
+        } else if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TRANSLATABLE)) {
+            this.type = DiscoveryConfigurationParameters.TYPE_TRANSLATABLE;
         } else if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)) {
             throw new DiscoveryConfigurationException(
                 "The " + type + " can't be used with a default side bar facet use the " +

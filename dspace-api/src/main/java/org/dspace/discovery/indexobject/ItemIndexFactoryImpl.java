@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -45,6 +46,7 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
 import org.dspace.discovery.FullTextContentStreams;
 import org.dspace.discovery.SearchUtils;
@@ -522,7 +524,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                         // if searchFilter is of type "facet", delegate to indexIfFilterTypeFacet method
                         if (searchFilter.getFilterType().equals(DiscoverySearchFilterFacet.FILTER_TYPE_FACET)) {
                             indexIfFilterTypeFacet(doc, searchFilter, value, date,
-                                                   authority, preferedLabel, separator);
+                                                   authority, preferedLabel, separator, collection, metadataField);
                         }
                     }
                 }
@@ -731,7 +733,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
      * @param separator the separator being used to separate lowercase and regular case
      */
     private void indexIfFilterTypeFacet(SolrInputDocument doc, DiscoverySearchFilter searchFilter, String value,
-                                   Date date, String authority, String preferedLabel, String separator) {
+                                   Date date, String authority, String preferedLabel, String separator,
+                                        Collection collection, MetadataField metadataField) {
         if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_TEXT)) {
             //Add a special filter
             //We use a separator to split up the lowercase and regular case, this is needed to
@@ -815,6 +818,53 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             }
             //Also add prefix field with all parts of value
             saveFacetPrefixParts(doc, searchFilter, value, separator, authority, preferedLabel);
+        } else if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_TRANSLATABLE)) {
+            Locale[] supportedLocales = I18nUtil.getSupportedLocales();
+            for (Locale supportedLocale : supportedLocales) {
+                // Exception language
+                if ("lang".equals(searchFilter.getIndexFieldName())) {
+                    // FIXME: la traduccions al català no funcionen bé amb ISO3, s'hauria de
+                    // fer una segona transformació
+                    String code = I18nUtil.convertToISO6392B(value);
+                    Locale localeFromCode = new Locale(code);
+
+                    String translated = code;
+                    // Is a valid locale
+                    if (supportedLocale.getISO3Language() != null) {
+                        translated = StringUtils.capitalize(localeFromCode.getDisplayLanguage(supportedLocale));
+                    }
+                    log.debug("Translate " + value + " to " + supportedLocale.getLanguage() + " => " +
+                              translated);
+                    doc.addField(
+                        searchFilter.getIndexFieldName() + "_i18n_" + supportedLocale + "_filter",
+                        translated.toLowerCase() + separator + translated);
+                    doc.addField(searchFilter.getIndexFieldName() + "_keyword", translated);
+                } else {
+
+                    String fieldKey = metadataAuthorityService.makeFieldKey(
+                        metadataField.getMetadataSchema().getName(),
+                        metadataField.getElement(),
+                        metadataField.getQualifier());
+
+                    // put up just a selector when preferred choice presentation is select:
+                    if (choiceAuthorityService.isChoicesConfigured(fieldKey, collection)) {
+                        String translated =
+                            choiceAuthorityService.getLabel(fieldKey,
+                                collection, value, supportedLocale.getLanguage());
+                        if (translated.startsWith("UNKNOWN KEY ")) {
+                            translated = value;
+                        }
+                        log.debug("Translate " + value + " to " + supportedLocale.getLanguage() + " => " +
+                                 translated);
+                        doc.addField(
+                            searchFilter.getIndexFieldName() + "_i18n_" +
+                            supportedLocale.toString() + "_filter",
+                            translated.toLowerCase() + separator + translated);
+                        doc.addField(searchFilter.getIndexFieldName() + "_keyword", translated);
+                    }
+                }
+            }
+            doc.addField(searchFilter.getIndexFieldName() + "_keyword", value);
         }
     }
 

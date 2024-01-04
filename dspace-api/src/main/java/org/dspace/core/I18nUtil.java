@@ -413,4 +413,36 @@ public class I18nUtil {
         }
         return isSupported;
     }
+
+    /**
+     * Convert some code languages ISO-6392/T to ISO-6392/B
+     *
+     * @param code code language string to convert
+     * @return ISO-6392/B version if exists
+     */
+    public static String convertToISO6392B(String code) {
+        switch(code) {
+            case "bod":	return "tib";
+            case "ces":	return "cze";
+            case "cym":	return "wel";
+            case "deu":	return "ger";
+            case "ell":	return "gre";
+            case "eus":	return "baq";
+            case "fas":	return "per";
+            case "fra":	return "fre";
+            case "hye":	return "arm";
+            case "isl":	return "ice";
+            case "kat":	return "geo";
+            case "mkd":	return "mac";
+            case "mri":	return "mao";
+            case "msa":	return "may";
+            case "mya":	return "bur";
+            case "nld":	return "dut";
+            case "ron":	return "rum";
+            case "slk":	return "slo";
+            case "sqi":	return "alb";
+            case "zho":	return "chi";
+            default:    return code;
+        }
+    }
 }

@@ -913,9 +913,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if (0 < facetFields.size()) {
             //Only add facet information if there are any facets
             for (DiscoverFacetField facetFieldConfig : facetFields) {
-                String field = transformFacetField(facetFieldConfig, facetFieldConfig.getField(), false);
+                String field = transformFacetField(facetFieldConfig, facetFieldConfig.getField(), false, context.getCurrentLocale());
                 if (facetFieldConfig.getPrefix() != null) {
-                    field = transformPrefixFacetField(facetFieldConfig, facetFieldConfig.getField(), false);
+                    field = transformPrefixFacetField(facetFieldConfig, facetFieldConfig.getField(), false, context.getCurrentLocale());
                 }
                 solrQuery.addFacetField(field);
 
@@ -1103,7 +1103,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         for (FacetField.Count facetValue : facetValues) {
                             String displayedValue = transformDisplayedValue(context, facetField.getName(),
                                                                             facetValue.getName());
-                            String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
+                            String field = transformFacetField(facetFieldConfig, facetField.getName(), true,
+                                context.getCurrentLocale());
                             String authorityValue = transformAuthorityValue(context, facetField.getName(),
                                                                             facetValue.getName());
                             String sortValue = transformSortValue(context,
@@ -1363,7 +1364,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * facet filter field
      */
     protected String transformPrefixFacetField(DiscoverFacetField facetFieldConfig, String field,
-        boolean removePostfix) {
+        boolean removePostfix, Locale currentLocale) {
         if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_TEXT) ||
             facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)) {
             if (removePostfix) {
@@ -1372,13 +1373,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 return field + SOLR_FIELD_SUFFIX_FACET_PREFIXES;
             }
         } else {
-            return this.transformFacetField(facetFieldConfig, field, removePostfix);
+            return this.transformFacetField(facetFieldConfig, field, removePostfix, currentLocale);
         }
     }
 
-    protected String transformFacetField(DiscoverFacetField facetFieldConfig, String field, boolean removePostfix) {
+    protected String transformFacetField(DiscoverFacetField facetFieldConfig, String field, boolean removePostfix,
+                                         Locale currentLocale) {
         if (field.contains(SOLR_FIELD_SUFFIX_FACET_PREFIXES)) {
-            return this.transformPrefixFacetField(facetFieldConfig, field, removePostfix);
+            return this.transformPrefixFacetField(facetFieldConfig, field, removePostfix, currentLocale);
         }
         if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_TEXT)) {
             if (removePostfix) {
@@ -1404,6 +1406,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             } else {
                 //Only display top level filters !
                 return field + "_tax_0_filter";
+            }
+        } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_TRANSLATABLE)) {
+            if (removePostfix) {
+                return StringUtils.substringBeforeLast(field, "_i18n_");
+            } else {
+                return field + "_i18n_" + currentLocale.toString() + "_filter";
             }
         } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_AUTHORITY)) {
             if (removePostfix) {
