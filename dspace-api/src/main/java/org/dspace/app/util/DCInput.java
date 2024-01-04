@@ -67,11 +67,6 @@ public class DCInput {
     private String label = null;
 
     /**
-     * labels translations describing input
-     */
-    private HashMap<String, String> labelI18n = new HashMap<>();
-
-    /**
      * a style instruction to apply to the input. The exact way to use the style value is UI depending that receive the
      * value from the REST API as is
      */
@@ -93,11 +88,6 @@ public class DCInput {
     private String warning = null;
 
     /**
-     * if required, translation text to display when missing
-     */
-    private HashMap<String, String> warningI18n = new HashMap<>();
-
-    /**
      * is input repeatable?
      */
     private boolean repeatable = false;
@@ -111,11 +101,6 @@ public class DCInput {
      * 'hint' text to display
      */
     private String hint = null;
-
-    /**
-     * 'hint' text translations to display
-     */
-    private HashMap<String, String> hintI8n = new HashMap<>();
 
     /**
      * if input list-controlled, name of list
@@ -508,8 +493,8 @@ public class DCInput {
      */
     public String getDisplayString(String pairTypeName, String storedString) {
         if (valueList != null && storedString != null) {
-            for (int i = 0; i < valueList.size(); i += 2) {
-                if (storedString.equals(valueList.get(i + 1).getStored())) {
+            for (int i = 0; i < valueList.size(); i++) {
+                if (storedString.equals(valueList.get(i).getStored())) {
                     return valueList.get(i).getDisplayed();
                 }
             }
@@ -528,7 +513,7 @@ public class DCInput {
      */
     public String getStoredString(String pairTypeName, String displayedString) {
         if (valueList != null && displayedString != null) {
-            for (int i = 0; i < valueList.size(); i += 2) {
+            for (int i = 0; i < valueList.size(); i++) {
                 if (displayedString.equals(valueList.get(i).getDisplayed())) {
                     return valueList.get(i).getStored();
                 }
