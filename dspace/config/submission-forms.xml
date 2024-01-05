@@ -1597,6 +1597,266 @@
             </pair>
         </value-pairs>
 
+        <value-pairs value-pairs-name="common_types_upc" dc-term="type">
+            <pair>
+                <displayed-value>Lecture notes</displayed-value>
+                <displayed-value-i18n lang="es">Apuntes</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Apunts</displayed-value-i18n>
+                <stored-value>Lecture notes</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Article</displayed-value>
+                <displayed-value-i18n lang="es">Artículo</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Article</displayed-value-i18n>
+                <stored-value>Article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Contribution to periodical</displayed-value>
+                <displayed-value-i18n lang="es">Contribución a periódico</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Article de premsa</displayed-value-i18n>
+                <stored-value>Contribution to periodical</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Audiovisual</displayed-value>
+                <displayed-value-i18n lang="es">Audiovisual</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Audiovisual</displayed-value-i18n>
+                <stored-value>Audiovisual</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Part of book or chapter of book</displayed-value>
+                <displayed-value-i18n lang="es">Parte de libro o capítulo de libro</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Capítol de llibre</displayed-value-i18n>
+                <stored-value>Part of book or chapter of book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Nautical chart</displayed-value>
+                <displayed-value-i18n lang="es">Carta náutica</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Carta nàutica</displayed-value-i18n>
+                <stored-value>Nautical chart</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Conference lecture</displayed-value>
+                <displayed-value-i18n lang="es">Conferencia</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Conferència</displayed-value-i18n>
+                <stored-value>Conference lecture</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Internal report</displayed-value>
+                <displayed-value-i18n lang="es">Informe interno</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Informe intern</displayed-value-i18n>
+                <stored-value>Internal report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dataset</displayed-value>
+                <displayed-value-i18n lang="es">Conjunto de datos</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Conjunt de dades</displayed-value-i18n>
+                <stored-value>Dataset</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Practical exercise</displayed-value>
+                <displayed-value-i18n lang="es">Ejercicio práctico</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Exercici pràctic</displayed-value-i18n>
+                <stored-value>Practical exercise</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Exam</displayed-value>
+                <displayed-value-i18n lang="es">Examen</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Exàmen</displayed-value-i18n>
+                <stored-value>Exam</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Subject guide</displayed-value>
+                <displayed-value-i18n lang="es">Guía temática</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Guia temàtica</displayed-value-i18n>
+                <stored-value>Subject guide</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Image</displayed-value>
+                <displayed-value-i18n lang="es">Imagen</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Imatge</displayed-value-i18n>
+                <stored-value>Image</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book</displayed-value>
+                <displayed-value-i18n lang="es">Libro</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Llibre</displayed-value-i18n>
+                <stored-value>Book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Memorandum</displayed-value>
+                <displayed-value-i18n lang="es">Memorando</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Memoràndum</displayed-value-i18n>
+                <stored-value>Memorandum</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Journal</displayed-value>
+                <displayed-value-i18n lang="es">Revista</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Número de Revista</displayed-value-i18n>
+                <stored-value>Journal</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Syllabus</displayed-value>
+                <displayed-value-i18n lang="es">Plan de estudios</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Pla d'estudis</displayed-value-i18n>
+                <stored-value>Syllabus</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Practice</displayed-value>
+                <displayed-value-i18n lang="es">Práctica</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Pràctica</displayed-value-i18n>
+                <stored-value>Practice</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Lecture</displayed-value>
+                <displayed-value-i18n lang="es">Presentación</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Presentació</displayed-value-i18n>
+                <stored-value>Lecture</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Master thesis (pre-Bologna period)</displayed-value>
+                <displayed-value-i18n lang="es">Tesis de maestría (período pre-Bolonia)</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Projecte/Treball Final de Carrera</displayed-value-i18n>
+                <stored-value>Master thesis (pre-Bologna period)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bachelor thesis</displayed-value>
+                <displayed-value-i18n lang="es">Tesis de licenciatura</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Treball Final de Grau</displayed-value-i18n>
+                <stored-value>Bachelor thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Problem statement, exercise</displayed-value>
+                <displayed-value-i18n lang="es">Declaración de problema, ejercicio</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Problema, exercici</displayed-value-i18n>
+                <stored-value>Problem statement, exercise</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Course description</displayed-value>
+                <displayed-value-i18n lang="es">Descripción del curso</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Programa docent</displayed-value-i18n>
+                <stored-value>Course description</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Software</displayed-value>
+                <displayed-value-i18n lang="es">Software</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Programari</displayed-value-i18n>
+                <stored-value>Software</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Collaborative project</displayed-value>
+                <displayed-value-i18n lang="es">Proyecto colaborativo</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Projecte de col·laboració</displayed-value-i18n>
+                <stored-value>Collaborative project</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Master thesis</displayed-value>
+                <displayed-value-i18n lang="es">Tesis de maestría</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Projecte Final de Màster Oficial</displayed-value-i18n>
+                <stored-value>Master thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>UPC Master thesis</displayed-value>
+                <displayed-value-i18n lang="es">Tesis de maestría UPC</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Projecte Final de Màster UPC</displayed-value-i18n>
+                <stored-value>UPC Master thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Postgraduate master thesis</displayed-value>
+                <displayed-value-i18n lang="es">Tesis de maestría de postgrado</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Projecte Final de Postgrau</displayed-value-i18n>
+                <stored-value>Postgraduate master thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Doctoral thesis project</displayed-value>
+                <displayed-value-i18n lang="es">Proyecto de tesis doctoral</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Projecte de tesi</displayed-value-i18n>
+                <stored-value>Doctoral thesis project</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Doctoral thesis proposal</displayed-value>
+                <displayed-value-i18n lang="es">Propuesta de tesis doctoral</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Proposta de tesi</displayed-value-i18n>
+                <stored-value>Doctoral thesis proposal</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Recognition of foreign diploma</displayed-value>
+                <displayed-value-i18n lang="es">Reconocimiento de título extranjero</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Projecte per a l'homologació del títol</displayed-value-i18n>
+                <stored-value>Recognition of foreign diploma</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>External research report</displayed-value>
+                <displayed-value-i18n lang="es">Informe de investigación externa</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Report de recerca</displayed-value-i18n>
+                <stored-value>External research report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Review</displayed-value>
+                <displayed-value-i18n lang="es">Reseña</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Ressenya</displayed-value-i18n>
+                <stored-value>Review</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Sound</displayed-value>
+                <displayed-value-i18n lang="es">Sonido</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">So</displayed-value-i18n>
+                <stored-value>Sound</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Minor thesis</displayed-value>
+                <displayed-value-i18n lang="es">Tesis menor</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Tesina</displayed-value-i18n>
+                <stored-value>Minor thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Conference report</displayed-value>
+                <displayed-value-i18n lang="es">Informe de conferencia</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Text en actes de congrés</displayed-value-i18n>
+                <stored-value>Conference report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Coursework</displayed-value>
+                <displayed-value-i18n lang="es">Trabajo de curso</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Treball d'assignatura</displayed-value-i18n>
+                <stored-value>Coursework</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Tutored research work</displayed-value>
+                <displayed-value-i18n lang="es">Trabajo de investigación tutorizado</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Treball de recerca tutelat</displayed-value-i18n>
+                <stored-value>Tutored research work</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Diploma final work</displayed-value>
+                <displayed-value-i18n lang="es">Trabajo final de diploma</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Treball Fi de Diploma</displayed-value-i18n>
+                <stored-value>Diploma final work</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Professional work</displayed-value>
+                <displayed-value-i18n lang="es">Trabajo profesional</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Treball professional</displayed-value-i18n>
+                <stored-value>Professional work</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Website</displayed-value>
+                <displayed-value-i18n lang="es">Sitio web</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Website</displayed-value-i18n>
+                <stored-value>Website</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Working paper</displayed-value>
+                <displayed-value-i18n lang="es">Documento de trabajo</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Working paper</displayed-value-i18n>
+                <stored-value>Working paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <displayed-value-i18n lang="es">Otro</displayed-value-i18n>
+                <displayed-value-i18n lang="ca">Altres</displayed-value-i18n>
+                <stored-value>Other</stored-value>
+            </pair>
+        </value-pairs>
 
         <!-- default language order: (from dspace 1.2.1)
              "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
