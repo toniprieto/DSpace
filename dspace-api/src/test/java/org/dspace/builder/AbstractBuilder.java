@@ -178,7 +178,12 @@ public abstract class AbstractBuilder<T, S> {
         systemWideAlertService = DSpaceServicesFactory.getInstance().getServiceManager()
                                                       .getServicesByType(SystemWideAlertService.class).get(0);
         try {
-            submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+            SubmissionServiceFactory submissionServiceFactory = SubmissionServiceFactory.getInstance();
+            if (submissionServiceFactory != null) {
+                submissionConfigService = submissionServiceFactory.getSubmissionConfigService();
+            } else {
+                log.error("ERROR: Error initializing submissionServiceFactory");
+            }
         } catch (SubmissionConfigReaderException e) {
             log.error(e.getMessage(), e);
         }
