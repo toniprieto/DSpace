@@ -69,6 +69,9 @@ public class SubmissionConfigIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
+        // Reload the submission config service to be sure that the new collection with entityType is correctly mapped
+        submissionConfigService.reload();
+
         // for col1, it should return the item submission form defined for their parent subcom1
         SubmissionConfig submissionConfig1 = submissionConfigService.getSubmissionConfigByCollection(col1);
         assertEquals("subcommunitytest", submissionConfig1.getSubmissionName());
