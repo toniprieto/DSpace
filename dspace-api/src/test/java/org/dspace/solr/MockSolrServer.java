@@ -147,9 +147,9 @@ public class MockSolrServer {
                 log.info("SOLR Server for core {} destroyed", coreName);
             }
 
-            if (usersPerCore.isEmpty()) {
-                destroyContainer();
-            }
+            //if (usersPerCore.isEmpty()) {
+            //    destroyContainer();
+            //}
         }
     }
 
