@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -180,18 +181,33 @@ public class SolrBrowseDAO implements BrowseDAO {
             addDefaultFilterQueries(query);
             if (distinct) {
                 DiscoverFacetField dff;
+
+                // To get the number of distinct values we use the next "json.facet" query param
+                // {"entries_count": {"type":"terms","field": "<fieldName>_filter", "limit":0, "numBuckets":true}}"
+                JsonObject jsonFacet = new JsonObject();
+                JsonObject entriesCount = new JsonObject();
+                entriesCount.addProperty("type", "terms");
+                entriesCount.addProperty("field", facetField + "_filter");
+                entriesCount.addProperty("limit", 0);
+                entriesCount.addProperty("numBuckets", true);
+                jsonFacet.add("entries_count", entriesCount);
+
                 if (StringUtils.isNotBlank(startsWith)) {
                     dff = new DiscoverFacetField(facetField,
-                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                        DiscoveryConfigurationParameters.SORT.VALUE, startsWith);
+                        DiscoveryConfigurationParameters.TYPE_TEXT, limit,
+                        DiscoveryConfigurationParameters.SORT.VALUE, startsWith, offset);
+
+                    // Add the prefix to the json facet query
+                    jsonFacet.get("entries_count").getAsJsonObject().addProperty("prefix", startsWith);
                 } else {
                     dff = new DiscoverFacetField(facetField,
-                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                        DiscoveryConfigurationParameters.SORT.VALUE);
+                        DiscoveryConfigurationParameters.TYPE_TEXT, limit,
+                        DiscoveryConfigurationParameters.SORT.VALUE, offset);
                 }
                 query.addFacetField(dff);
                 query.setFacetMinCount(1);
                 query.setMaxResults(0);
+                query.addProperty("json.facet", jsonFacet.toString());
             } else {
                 query.setMaxResults(limit/* > 0 ? limit : 20*/);
                 if (offset > 0) {
@@ -248,8 +264,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
         int count = 0;
         if (distinct) {
-            List<FacetResult> facetResults = resp.getFacetResult(facetField);
-            count = facetResults.size();
+            count = (int) resp.getTotalEntries();
         } else {
             // we need to cast to int to respect the BrowseDAO contract...
             count = (int) resp.getTotalSearchResults();
@@ -266,8 +281,8 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
         List<FacetResult> facet = resp.getFacetResult(facetField);
         int count = doCountQuery();
-        int start = offset > 0 ? offset : 0;
-        int max = limit > 0 ? limit : count; //if negative, return everything
+        int start = 0;
+        int max = facet.size();
         List<String[]> result = new ArrayList<>();
         if (ascending) {
             for (int i = start; i < (start + max) && i < count; i++) {
