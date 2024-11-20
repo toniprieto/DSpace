@@ -48,15 +48,15 @@ public class ContextReadOnlyCacheTest {
         Item item = Mockito.mock(Item.class);
         when(item.getID()).thenReturn(UUID.randomUUID());
 
-        readOnlyCache.cacheAuthorizedAction(item, Constants.READ, ePerson, true);
-        readOnlyCache.cacheAuthorizedAction(item, Constants.WRITE, ePerson, false);
+        readOnlyCache.cacheAuthorizedAction(item, Constants.READ, ePerson, true, false);
+        readOnlyCache.cacheAuthorizedAction(item, Constants.WRITE, ePerson, false, false);
 
-        assertTrue(readOnlyCache.getCachedAuthorizationResult(item, Constants.READ, ePerson));
-        assertFalse(readOnlyCache.getCachedAuthorizationResult(item, Constants.WRITE, ePerson));
+        assertTrue(readOnlyCache.getCachedAuthorizationResult(item, Constants.READ, ePerson, false));
+        assertFalse(readOnlyCache.getCachedAuthorizationResult(item, Constants.WRITE, ePerson, false));
 
-        assertNull(readOnlyCache.getCachedAuthorizationResult(item, Constants.ADMIN, ePerson));
-        assertNull(readOnlyCache.getCachedAuthorizationResult(item, Constants.READ, null));
-        assertNull(readOnlyCache.getCachedAuthorizationResult(null, Constants.READ, ePerson));
+        assertNull(readOnlyCache.getCachedAuthorizationResult(item, Constants.ADMIN, ePerson, false));
+        assertNull(readOnlyCache.getCachedAuthorizationResult(item, Constants.READ, null, false));
+        assertNull(readOnlyCache.getCachedAuthorizationResult(null, Constants.READ, ePerson, false));
     }
 
     @Test
@@ -99,18 +99,18 @@ public class ContextReadOnlyCacheTest {
         Group group1 = buildGroupMock("Test Group 1");
 
         //load data into the cache
-        readOnlyCache.cacheAuthorizedAction(item, Constants.READ, ePerson, true);
+        readOnlyCache.cacheAuthorizedAction(item, Constants.READ, ePerson, true, false);
         readOnlyCache.cacheGroupMembership(group1, ePerson, true);
 
         //double check the data is there
-        assertTrue(readOnlyCache.getCachedAuthorizationResult(item, Constants.READ, ePerson));
+        assertTrue(readOnlyCache.getCachedAuthorizationResult(item, Constants.READ, ePerson, false));
         assertTrue(readOnlyCache.getCachedGroupMembership(group1, ePerson));
 
         //clear the cache
         readOnlyCache.clear();
 
         //check that the data is not present anymore
-        assertNull(readOnlyCache.getCachedAuthorizationResult(item, Constants.READ, ePerson));
+        assertNull(readOnlyCache.getCachedAuthorizationResult(item, Constants.READ, ePerson, false));
         assertNull(readOnlyCache.getCachedGroupMembership(group1, ePerson));
     }
 

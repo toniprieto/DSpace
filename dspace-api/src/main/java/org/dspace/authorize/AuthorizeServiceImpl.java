@@ -246,7 +246,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
 
         // If authorization was given before and cached
-        Boolean cachedResult = c.getCachedAuthorizationResult(o, action, e);
+        Boolean cachedResult = c.getCachedAuthorizationResult(o, action, e, useInheritance);
         if (cachedResult != null) {
             return cachedResult;
         }
@@ -305,7 +305,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             // check policies for date validity
             if (resourcePolicyService.isDateValid(rp)) {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(userToCheck)) {
-                    c.cacheAuthorizedAction(o, action, e, true, rp);
+                    c.cacheAuthorizedAction(o, action, e, true, rp, useInheritance);
                     return true; // match
                 }
 
@@ -313,7 +313,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                     && groupService.isMember(c, e, rp.getGroup())) {
                     // group was set, and eperson is a member
                     // of that group
-                    c.cacheAuthorizedAction(o, action, e, true, rp);
+                    c.cacheAuthorizedAction(o, action, e, true, rp, useInheritance);
                     return true;
                 }
             }
@@ -331,12 +331,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                                       .getAdminObject(c, o, action) : null;
 
             if (isAdmin(c, e, adminObject)) {
-                c.cacheAuthorizedAction(o, action, e, true, null);
+                c.cacheAuthorizedAction(o, action, e, true, null, useInheritance);
                 return true;
             }
         }
         // default authorization is denial
-        c.cacheAuthorizedAction(o, action, e, false, null);
+        c.cacheAuthorizedAction(o, action, e, false, null, useInheritance);
         return false;
     }
 
@@ -376,7 +376,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return false;
         }
 
-        Boolean cachedResult = c.getCachedAuthorizationResult(o, Constants.ADMIN, e);
+        Boolean cachedResult = c.getCachedAuthorizationResult(o, Constants.ADMIN, e, false);
         if (cachedResult != null) {
             return cachedResult;
         }
@@ -390,7 +390,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             // check policies for date validity
             if (resourcePolicyService.isDateValid(rp)) {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(e)) {
-                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp);
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp, false);
                     return true; // match
                 }
 
@@ -398,7 +398,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                     && groupService.isMember(c, e, rp.getGroup())) {
                     // group was set, and eperson is a member
                     // of that group
-                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp);
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp, false);
                     return true;
                 }
             }
@@ -417,11 +417,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         DSpaceObject parent = serviceFactory.getDSpaceObjectService(o).getParentObject(c, o);
         if (parent != null) {
             boolean admin = isAdmin(c, e, parent);
-            c.cacheAuthorizedAction(o, Constants.ADMIN, e, admin, null);
+            c.cacheAuthorizedAction(o, Constants.ADMIN, e, admin, null, false);
             return admin;
         }
 
-        c.cacheAuthorizedAction(o, Constants.ADMIN, e, false, null);
+        c.cacheAuthorizedAction(o, Constants.ADMIN, e, false, null, false);
         return false;
     }
 

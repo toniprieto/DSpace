@@ -898,18 +898,19 @@ public class Context implements AutoCloseable {
         dbConnection.uncacheEntity(entity);
     }
 
-    public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
+    public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson,
+                                                boolean useInheritance) {
         if (isReadOnly()) {
-            return readOnlyCache.getCachedAuthorizationResult(dspaceObject, action, eperson);
+            return readOnlyCache.getCachedAuthorizationResult(dspaceObject, action, eperson, useInheritance);
         } else {
             return null;
         }
     }
 
     public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result,
-                                      ResourcePolicy rp) {
+                                      ResourcePolicy rp, boolean useInheritance) {
         if (isReadOnly()) {
-            readOnlyCache.cacheAuthorizedAction(dspaceObject, action, eperson, result);
+            readOnlyCache.cacheAuthorizedAction(dspaceObject, action, eperson, result, useInheritance);
             try {
                 uncacheEntity(rp);
             } catch (SQLException e) {

@@ -29,6 +29,8 @@ public class ContextReadOnlyCache {
      * The key of the cache is: DSpace Object ID, action ID, Eperson ID.
      */
     private final HashMap<Triple<String, Integer, String>, Boolean> authorizedActionsCache = new HashMap<>();
+    private final HashMap<Triple<String, Integer, String>, Boolean> authorizedActionsWithInheritanceCache =
+        new HashMap<>();
 
     /**
      * Group membership cache that is used when the context is in READ_ONLY mode.
@@ -41,12 +43,22 @@ public class ContextReadOnlyCache {
      */
     private final HashMap<String, Set<Group>> allMemberGroupsCache = new HashMap<>();
 
-    public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
-        return authorizedActionsCache.get(buildAuthorizedActionKey(dspaceObject, action, eperson));
+    public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson,
+                                                boolean useInheritance) {
+        if (useInheritance) {
+            return authorizedActionsWithInheritanceCache.get(buildAuthorizedActionKey(dspaceObject, action, eperson));
+        } else {
+            return authorizedActionsCache.get(buildAuthorizedActionKey(dspaceObject, action, eperson));
+        }
     }
 
-    public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result) {
-        authorizedActionsCache.put(buildAuthorizedActionKey(dspaceObject, action, eperson), result);
+    public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result,
+                                      boolean useInheritance) {
+        if (useInheritance) {
+            authorizedActionsWithInheritanceCache.put(buildAuthorizedActionKey(dspaceObject, action, eperson), result);
+        } else {
+            authorizedActionsCache.put(buildAuthorizedActionKey(dspaceObject, action, eperson), result);
+        }
     }
 
     public Boolean getCachedGroupMembership(Group group, EPerson eperson) {
@@ -81,6 +93,7 @@ public class ContextReadOnlyCache {
 
     public void clear() {
         authorizedActionsCache.clear();
+        authorizedActionsWithInheritanceCache.clear();
         groupMembershipCache.clear();
         allMemberGroupsCache.clear();
     }
