@@ -24,6 +24,8 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -57,6 +59,9 @@ public class ItemCountDAOSolr implements ItemCountDAO {
     @Autowired
     protected SearchService searchService;
 
+    @Autowired
+    protected RequestService requestService;
+
     /**
      * Get the count of the items in the given container.
      *
@@ -88,8 +93,15 @@ public class ItemCountDAOSolr implements ItemCountDAO {
      * @param context DSpace Context
      */
     private void loadCount(Context context) {
+        Request request = requestService.getCurrentRequest();
         if (communitiesCount != null || collectionsCount != null) {
             return;
+        } else if (request != null) {
+            communitiesCount = (Map<String, Integer>) request.getAttribute("itemCounter.communitiesCount");
+            collectionsCount = (Map<String, Integer>) request.getAttribute("itemCounter.collectionsCount");
+            if (communitiesCount != null || collectionsCount != null) {
+                return;
+            }
         }
 
         communitiesCount = new HashMap<>();
@@ -122,6 +134,11 @@ public class ItemCountDAOSolr implements ItemCountDAO {
             }
         } catch (SearchServiceException e) {
             log.error("Could not initialize Community/Collection Item Counts from Solr: ", e);
+        }
+
+        if (request != null) {
+            request.setAttribute("itemCounter.communitiesCount", communitiesCount);
+            request.setAttribute("itemCounter.collectionsCount", collectionsCount);
         }
     }
 }
