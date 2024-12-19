@@ -20,6 +20,7 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -38,6 +39,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -220,16 +222,47 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @SearchRestMethod(name = "findAdminAuthorized")
     public Page<CommunityRest> findAdminAuthorized (
         Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.ADMIN, query);
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findEditAuthorized")
+    public Page<CommunityRest> findEditAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.WRITE, query);
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findAddAuthorized")
+    public Page<CommunityRest> findAddAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.ADD, query);
+    }
+
+    private Page<CommunityRest> findAuthorized(Pageable pageable, int action, String query) {
         try {
             Context context = obtainContext();
-            List<Community> communities = authorizeService.findAdminAuthorizedCommunity(context, query,
+            query = getAutocompleteQuery(query);
+            List<Community> communities = authorizeService.findAuthorizedByActionCommunity(context, query,
+                action,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
-            long tot = authorizeService.countAdminAuthorizedCommunity(context, query);
+            long tot = authorizeService.countAuthorizedByActionCommunity(context, action, query);
             return converter.toRestPage(communities, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private String getAutocompleteQuery(String query) {
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(query);
+            buildQuery.append("(").append(escapedQuery).append(" OR dc.title_sort:*")
+                .append(escapedQuery).append("*").append(")");
+            return buildQuery.toString();
+        }
+        return query;
     }
 
     @Override

@@ -9,6 +9,7 @@ package org.dspace.authorize.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
@@ -75,7 +76,7 @@ public interface ResourcePolicyService {
      */
     public List<ResourcePolicy> find(Context c, EPerson ePerson) throws SQLException;
 
-    public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id)
+    public List<ResourcePolicy> find(Context c, EPerson e, Set<Group> groups, int action, int type_id)
         throws SQLException;
 
     /**

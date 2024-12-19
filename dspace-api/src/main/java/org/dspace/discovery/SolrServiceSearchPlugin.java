@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery;
 
+import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.dspace.core.Context;
 
@@ -27,6 +29,7 @@ public interface SolrServiceSearchPlugin {
      * @param solrQuery The query that will be sent to solr and which may be edited by this plugin.
      * @throws SearchServiceException Any checked exception that might happen in this plugin
      */
-    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery)
+    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery,
+                                           Map<String, Object> params)
             throws SearchServiceException;
 }

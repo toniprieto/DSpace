@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.Query;
@@ -154,7 +155,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 
-    public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups,
+    public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, Set<Group> groups,
                                                                int action, int type_id) throws SQLException {
         // If groups and eperson are empty, return immediately
         if (CollectionUtils.isEmpty(groups) && e == null) {

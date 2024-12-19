@@ -10,6 +10,7 @@ package org.dspace.discovery;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -34,7 +35,8 @@ public class SolrServicePrivateItemPlugin implements SolrServiceSearchPlugin {
     protected SearchService searchService;
 
     @Override
-    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
+    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery,
+                                           Map<String, Object> params) {
         try {
             // Prevents access if user has no administrative rights on the community or collection.
             // NOTE: the resource restriction plugin adds location filters for community and collection admins.

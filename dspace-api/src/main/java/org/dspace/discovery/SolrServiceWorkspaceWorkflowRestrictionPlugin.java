@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +54,7 @@ public class SolrServiceWorkspaceWorkflowRestrictionPlugin implements SolrServic
 
     @Override
     public void additionalSearchParameters(
-            Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery
+            Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery, Map<String, Object> params
     ) throws SearchServiceException {
         boolean isWorkspace = StringUtils.startsWith(
                 discoveryQuery.getDiscoveryConfigurationName(),
