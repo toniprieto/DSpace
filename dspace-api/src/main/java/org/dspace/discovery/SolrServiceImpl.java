@@ -25,7 +25,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -51,8 +54,6 @@ import org.apache.solr.common.params.SpellingParams;
 import org.apache.solr.common.util.NamedList;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -73,7 +74,6 @@ import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -595,14 +595,52 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     @Override
-    public String createLocationQueryForAdministrableItems(Context context)
+    public String createLocationQueryForAdministrableDSOs(String epersonAndGroupClause) {
+        StringBuilder locationQuery = new StringBuilder();
+        try {
+
+            SolrQuery solrQuery = new SolrQuery();
+
+            String query = "*:*";
+            solrQuery.setQuery(query);
+            solrQuery.addField(SearchUtils.RESOURCE_ID_FIELD);
+            solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
+            solrQuery.addFilterQuery("(" + SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableCommunity.TYPE + " OR "
+                + SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableCollection.TYPE + ")");
+            solrQuery.addFilterQuery("admin:(" + epersonAndGroupClause + ")");
+            solrQuery.setRows(Integer.MAX_VALUE);
+
+            QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
+                solrSearchCore.REQUEST_METHOD);
+            if (solrQueryResponse != null) {
+                List<String> containerUUIDs = new ArrayList<>();
+                for (SolrDocument doc : solrQueryResponse.getResults()) {
+                    String type = (String) doc.getFieldValue(SearchUtils.RESOURCE_TYPE_FIELD);
+                    String uniqueID = (String) doc.getFieldValue(SearchUtils.RESOURCE_ID_FIELD);
+                    if (IndexableCommunity.TYPE.equals(type)) {
+                        containerUUIDs.add("m" + uniqueID);
+                    } else if (IndexableCollection.TYPE.equals(type)) {
+                        containerUUIDs.add("l" + uniqueID);
+                    }
+                }
+                if (!containerUUIDs.isEmpty()) {
+                    locationQuery.append("location:(");
+                    locationQuery.append(String.join(" OR ", containerUUIDs));
+                    return locationQuery.append(")").toString();
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to retrieve administrable communities and collections from Solr:", e);
+        }
+        return "";
+    }
+
+    @Override
+    public String createLocationQueryForAdministrableItems(Context context, Set<Group> groupList)
         throws SQLException {
         StringBuilder locationQuery = new StringBuilder();
 
         if (context.getCurrentUser() != null) {
-            List<Group> groupList = EPersonServiceFactory.getInstance().getGroupService()
-                                                         .allMemberGroups(context, context.getCurrentUser());
-
             List<ResourcePolicy> communitiesPolicies = AuthorizeServiceFactory.getInstance().getResourcePolicyService()
                                                                               .find(context, context.getCurrentUser(),
                                                                                     groupList, Constants.ADMIN,
@@ -613,41 +651,27 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                                                                     groupList, Constants.ADMIN,
                                                                                     Constants.COLLECTION);
 
-            List<Collection> allCollections = new ArrayList<>();
-
-            for (ResourcePolicy rp : collectionsPolicies) {
-                Collection collection = ContentServiceFactory.getInstance().getCollectionService()
-                                                             .find(context, rp.getdSpaceObject().getID());
-                allCollections.add(collection);
-            }
-
-            if (CollectionUtils.isNotEmpty(communitiesPolicies) || CollectionUtils.isNotEmpty(allCollections)) {
+            if (CollectionUtils.isNotEmpty(communitiesPolicies) || CollectionUtils.isNotEmpty(collectionsPolicies)) {
                 locationQuery.append("location:( ");
 
                 for (int i = 0; i < communitiesPolicies.size(); i++) {
                     ResourcePolicy rp = communitiesPolicies.get(i);
-                    Community community = ContentServiceFactory.getInstance().getCommunityService()
-                                                               .find(context, rp.getdSpaceObject().getID());
-
-                    locationQuery.append("m").append(community.getID());
+                    locationQuery.append("m").append(rp.getdSpaceObject().getID());
 
                     if (i != (communitiesPolicies.size() - 1)) {
                         locationQuery.append(" OR ");
                     }
-                    allCollections.addAll(ContentServiceFactory.getInstance().getCommunityService()
-                                                               .getAllCollections(context, community));
                 }
 
-                Iterator<Collection> collIter = allCollections.iterator();
-
-                if (communitiesPolicies.size() > 0 && allCollections.size() > 0) {
+                if (!communitiesPolicies.isEmpty() && !collectionsPolicies.isEmpty()) {
                     locationQuery.append(" OR ");
                 }
 
-                while (collIter.hasNext()) {
-                    locationQuery.append("l").append(collIter.next().getID());
+                for (int i = 0; i < collectionsPolicies.size(); i++) {
+                    ResourcePolicy rp = collectionsPolicies.get(i);
+                    locationQuery.append("l").append(rp.getdSpaceObject().getID());
 
-                    if (collIter.hasNext()) {
+                    if (i != (collectionsPolicies.size() - 1)) {
                         locationQuery.append(" OR ");
                     }
                 }
@@ -703,12 +727,29 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public DiscoverResult search(Context context, DiscoverQuery discoveryQuery)
         throws SearchServiceException {
+        return searchAuthorized(context, discoveryQuery, new int[]{});
+    }
+
+    /**
+     * Method to retrieve the results of a search to solr search core with options to specify the actions that the
+     * current user should be able to perform on the results. The READ action is not included as it is always checked.
+     *
+     * @param context DSpace Context object
+     * @param discoveryQuery   the discovery query object
+     * @param actions list of actions that the current user should be able to perform on the results. The READ
+     *                action is not included as it is always checked.
+     * @return discovery search result object
+     * @throws SearchServiceException if search error
+     */
+    @Override
+    public DiscoverResult searchAuthorized(Context context, DiscoverQuery discoveryQuery, int[] actions)
+        throws SearchServiceException {
         try {
             if (solrSearchCore.getSolr() == null) {
                 return new DiscoverResult();
             }
 
-            return retrieveResult(context, discoveryQuery);
+            return retrieveResult(context, discoveryQuery, actions);
 
         } catch (Exception e) {
             throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
@@ -781,7 +822,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
     }
 
-    protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery)
+    protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery, int[] actions)
         throws SearchServiceException {
         SolrQuery solrQuery = new SolrQuery();
 
@@ -913,20 +954,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         //Add any configured search plugins !
         List<SolrServiceSearchPlugin> solrServiceSearchPlugins = DSpaceServicesFactory.getInstance()
                 .getServiceManager().getServicesByType(SolrServiceSearchPlugin.class);
+
         for (SolrServiceSearchPlugin searchPlugin : solrServiceSearchPlugins) {
-            searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery);
+            searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery, actions);
         }
 
         return solrQuery;
     }
 
-    protected DiscoverResult retrieveResult(Context context, DiscoverQuery query)
+    protected DiscoverResult retrieveResult(Context context, DiscoverQuery query, int[] actions)
         throws SQLException, SolrServerException, IOException, SearchServiceException {
         // we use valid and executeLimit to decide if the solr query need to be re-run if we found some stale objects
         boolean valid = false;
         int executionCount = 0;
         DiscoverResult result = null;
-        SolrQuery solrQuery = resolveToSolrQuery(context, query);
+        SolrQuery solrQuery = resolveToSolrQuery(context, query, actions);
         // how many re-run of the query are allowed other than the first run
         int maxAttempts = configurationService.getIntProperty("discovery.removestale.attempts", 3);
         do {
@@ -1540,6 +1582,63 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         // otherwise you may accidentally BREAK field-based queries (which often
         // rely on special characters to separate the field from the query value)
         return ClientUtils.escapeQueryChars(query);
+    }
+
+    /**
+     * Utility method to format an autocomplete query over a specific field.
+     *
+     * Takes into account the possibility of receiving a query as a set of clauses separated by AND.
+     * For each clause, it is verified if it can be a Solr query on a specific field. If not, the
+     * clause is formatted to allow autocomplete search on the {@code autocompleteField} field.
+     *
+     * @param query to search for
+     * @param autocompleteField the field to use to autocomplete search, if null or empty no field is used
+     * @return the constructed solr query
+     */
+    @Override
+    public String formatAutoCompleteQuery(String query, String autocompleteField) {
+        if (StringUtils.isNotBlank(query)) {
+
+            String field = "";
+            if (StringUtils.isNotBlank(autocompleteField)) {
+                field = autocompleteField + ":";
+            }
+
+            String[] clauses = query.split(" AND ");
+
+            StringBuilder buildQuery = new StringBuilder();
+            for (int i = 0; i < clauses.length; i++) {
+                String clause = clauses[i];
+                if (isFieldSpecificQuery(clause)) {
+                    // Could be a field query, so we don't need to format the autocomplete search
+                    buildQuery.append(clause);
+                } else {
+                    // Format the clause to allow autocomplete search on the autocompleteField field
+                    String escapedClause = ClientUtils.escapeQueryChars(clause);
+                    buildQuery.append("(").append(escapedClause).append(" OR ").append(field).append("*")
+                        .append(escapedClause).append("*").append(")");
+                }
+
+                if (i < clauses.length - 1) {
+                    buildQuery.append(" AND ");
+                }
+            }
+            return buildQuery.toString();
+        }
+        return query;
+    }
+
+    /**
+     * Checks if the given query is a field specific query.
+     *
+     * @param queryPart the query part to check
+     * @return true if the query part is a field specific query, false otherwise
+     */
+    private boolean isFieldSpecificQuery(String queryPart) {
+        String regex = "^-?(\\w+\\.\\w+|\\w+):(\"[^\"]+\"|[^\\s]+)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(queryPart.trim());
+        return matcher.find();
     }
 
     @Override

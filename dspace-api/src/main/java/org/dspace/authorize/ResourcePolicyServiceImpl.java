@@ -121,7 +121,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id)
+    public List<ResourcePolicy> find(Context c, EPerson e, Set<Group> groups, int action, int type_id)
         throws SQLException {
         return resourcePolicyDAO.findByEPersonGroupTypeIdAction(c, e, groups, action, type_id);
     }

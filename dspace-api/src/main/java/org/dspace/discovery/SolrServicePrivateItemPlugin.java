@@ -34,7 +34,8 @@ public class SolrServicePrivateItemPlugin implements SolrServiceSearchPlugin {
     protected SearchService searchService;
 
     @Override
-    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
+    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery,
+                                           int[] actions) {
         try {
             // Prevents access if user has no administrative rights on the community or collection.
             // NOTE: the resource restriction plugin adds location filters for community and collection admins.
