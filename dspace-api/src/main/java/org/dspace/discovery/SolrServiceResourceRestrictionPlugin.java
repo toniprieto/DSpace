@@ -175,6 +175,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     private String getActionName(int action) {
 
         String actionName = Constants.actionText[action];
+        actionName = actionName.toLowerCase();
         if ("add".equals(actionName)) {
             return "submit";
         }
