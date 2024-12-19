@@ -10,12 +10,14 @@ package org.dspace.discovery;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.dspace.eperson.Group;
 
 /**
  * Search interface that discovery uses
@@ -68,6 +70,9 @@ public interface SearchService {
         throws SearchServiceException;
 
 
+    DiscoverResult searchAuthorized(Context context, DiscoverQuery discoveryQuery, int[] actions)
+        throws SearchServiceException;
+
     List<IndexableObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
                                  int max, String... filterquery);
 
@@ -101,10 +106,11 @@ public interface SearchService {
      * communities/collections only.
      *
      * @param context The relevant DSpace Context.
+     * @param groups  The groups the user is a member of.
      * @return query string specific to the user's rights
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    String createLocationQueryForAdministrableItems(Context context) throws SQLException;
+    String createLocationQueryForAdministrableItems(Context context, Set<Group> groups) throws SQLException;
 
     /**
      * Transforms the metadata field of the given sort configuration into the indexed field which we can then use in

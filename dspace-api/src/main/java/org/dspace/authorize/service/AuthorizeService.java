@@ -546,6 +546,9 @@ public interface AuthorizeService {
     List<Community> findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
         throws SearchServiceException, SQLException;
 
+    List<Community> findAuthorizedByActionCommunity(Context context, String query, int action, int offset, int limit)
+        throws SearchServiceException, SQLException;
+
     /**
      * Counts communities for which the current user is admin, AND which match the query.
      *
@@ -556,6 +559,9 @@ public interface AuthorizeService {
      * @throws SQLException
      */
     long countAdminAuthorizedCommunity(Context context, String query)
+        throws SearchServiceException, SQLException;
+
+    long countAuthorizedByActionCommunity(Context context, int action, String query)
         throws SearchServiceException, SQLException;
 
     /**
@@ -572,6 +578,9 @@ public interface AuthorizeService {
     List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
         throws SearchServiceException, SQLException;
 
+    List<Collection> findAuthorizedByActionCollection(Context context, String query, int[] actions, int offset,
+                                                      int limit) throws SearchServiceException, SQLException;
+
     /**
      * Counts collections for which the current user is admin, AND which match the query.
      *
@@ -582,6 +591,9 @@ public interface AuthorizeService {
      * @throws SQLException
      */
     long countAdminAuthorizedCollection(Context context, String query)
+        throws SearchServiceException, SQLException;
+
+    long countAuthorizedByActionCollection(Context context, int[] actions, String query)
         throws SearchServiceException, SQLException;
 
     /**

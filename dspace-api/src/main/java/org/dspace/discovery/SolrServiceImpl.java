@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -73,7 +74,6 @@ import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -588,14 +588,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     @Override
-    public String createLocationQueryForAdministrableItems(Context context)
+    public String createLocationQueryForAdministrableItems(Context context, Set<Group> groupList)
         throws SQLException {
         StringBuilder locationQuery = new StringBuilder();
 
         if (context.getCurrentUser() != null) {
-            List<Group> groupList = EPersonServiceFactory.getInstance().getGroupService()
-                                                         .allMemberGroups(context, context.getCurrentUser());
-
             List<ResourcePolicy> communitiesPolicies = AuthorizeServiceFactory.getInstance().getResourcePolicyService()
                                                                               .find(context, context.getCurrentUser(),
                                                                                     groupList, Constants.ADMIN,
@@ -627,13 +624,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (i != (communitiesPolicies.size() - 1)) {
                         locationQuery.append(" OR ");
                     }
-                    allCollections.addAll(ContentServiceFactory.getInstance().getCommunityService()
-                                                               .getAllCollections(context, community));
                 }
 
                 Iterator<Collection> collIter = allCollections.iterator();
 
-                if (communitiesPolicies.size() > 0 && allCollections.size() > 0) {
+                if (!communitiesPolicies.isEmpty() && !allCollections.isEmpty()) {
                     locationQuery.append(" OR ");
                 }
 
@@ -763,12 +758,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public DiscoverResult search(Context context, DiscoverQuery discoveryQuery)
         throws SearchServiceException {
+        return searchAuthorized(context, discoveryQuery, new int[]{});
+    }
+
+    @Override
+    public DiscoverResult searchAuthorized(Context context, DiscoverQuery discoveryQuery, int[] actions)
+        throws SearchServiceException {
         try {
             if (solrSearchCore.getSolr() == null) {
                 return new DiscoverResult();
             }
 
-            return retrieveResult(context, discoveryQuery);
+            return retrieveResult(context, discoveryQuery, actions);
 
         } catch (Exception e) {
             throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
@@ -841,7 +842,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
     }
 
-    protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery)
+    protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery, int[] actions)
         throws SearchServiceException {
         SolrQuery solrQuery = new SolrQuery();
 
@@ -969,20 +970,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         //Add any configured search plugins !
         List<SolrServiceSearchPlugin> solrServiceSearchPlugins = DSpaceServicesFactory.getInstance()
                 .getServiceManager().getServicesByType(SolrServiceSearchPlugin.class);
+
         for (SolrServiceSearchPlugin searchPlugin : solrServiceSearchPlugins) {
-            searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery);
+            searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery, actions);
         }
 
         return solrQuery;
     }
 
-    protected DiscoverResult retrieveResult(Context context, DiscoverQuery query)
+    protected DiscoverResult retrieveResult(Context context, DiscoverQuery query, int[] actions)
         throws SQLException, SolrServerException, IOException, SearchServiceException {
         // we use valid and executeLimit to decide if the solr query need to be re-run if we found some stale objects
         boolean valid = false;
         int executionCount = 0;
         DiscoverResult result = null;
-        SolrQuery solrQuery = resolveToSolrQuery(context, query);
+        SolrQuery solrQuery = resolveToSolrQuery(context, query, actions);
         // how many re-run of the query are allowed other than the first run
         int maxAttempts = configurationService.getIntProperty("discovery.removestale.attempts", 3);
         do {

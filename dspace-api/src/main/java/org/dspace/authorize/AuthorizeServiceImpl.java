@@ -761,7 +761,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @throws java.sql.SQLException passed through.
      */
     @Override
-    public boolean isItemAdmin(Context context) throws SQLException {
+    public boolean isItemAdmin(Context context) {
         return performCheck(context, "search.resourcetype:" + IndexableItem.TYPE);
     }
 
@@ -774,7 +774,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @throws java.sql.SQLException passed through.
      */
     @Override
-    public boolean isComColAdmin(Context context) throws SQLException {
+    public boolean isComColAdmin(Context context) {
         return performCheck(context,
             "(search.resourcetype:" + IndexableCommunity.TYPE + " OR search.resourcetype:" +
                 IndexableCollection.TYPE + ")");
@@ -792,11 +792,27 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public List<Community> findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
-        throws SearchServiceException, SQLException {
+        throws SearchServiceException {
         List<Community> communities = new ArrayList<>();
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCommunity.TYPE,
+                                                              IndexableCommunity.TYPE, Constants.ADMIN,
+            offset, limit, null, null);
+        for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
+            Community community = ((IndexableCommunity) solrCollections).getIndexedObject();
+            communities.add(community);
+        }
+        return communities;
+    }
+
+    @Override
+    public List<Community> findAuthorizedByActionCommunity(Context context, String query, int action, int offset,
+                                                           int limit)
+        throws SearchServiceException {
+        List<Community> communities = new ArrayList<>();
+        query = formatCustomQuery(query);
+        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+                                                                   IndexableCommunity.TYPE, action,
             offset, limit, null, null);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Community community = ((IndexableCommunity) solrCollections).getIndexedObject();
@@ -815,10 +831,20 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public long countAdminAuthorizedCommunity(Context context, String query)
-        throws SearchServiceException, SQLException {
+        throws SearchServiceException {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCommunity.TYPE,
+                                                              IndexableCommunity.TYPE, Constants.ADMIN,
+            null, null, null, null);
+        return discoverResult.getTotalSearchResults();
+    }
+
+    @Override
+    public long countAuthorizedByActionCommunity(Context context, int action, String query)
+        throws SearchServiceException {
+        query = formatCustomQuery(query);
+        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+                                                                   IndexableCommunity.TYPE, action,
             null, null, null, null);
         return discoverResult.getTotalSearchResults();
     }
@@ -835,7 +861,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
-        throws SearchServiceException, SQLException {
+        throws SearchServiceException {
         List<Collection> collections = new ArrayList<>();
         if (context.getCurrentUser() == null) {
             return collections;
@@ -843,7 +869,27 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCollection.TYPE,
+                                                              IndexableCollection.TYPE, Constants.ADMIN,
+            offset, limit, CollectionService.SOLR_SORT_FIELD, SORT_ORDER.asc);
+        for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
+            Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
+            collections.add(collection);
+        }
+        return collections;
+    }
+
+    @Override
+    public List<Collection> findAuthorizedByActionCollection(Context context, String query, int[] actions, int offset,
+                                                             int limit)
+        throws SearchServiceException {
+        List<Collection> collections = new ArrayList<>();
+        if (context.getCurrentUser() == null) {
+            return collections;
+        }
+
+        query = formatCustomQuery(query);
+        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+                                                                   IndexableCollection.TYPE, actions,
             offset, limit, CollectionService.SOLR_SORT_FIELD, SORT_ORDER.asc);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
@@ -862,10 +908,20 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public long countAdminAuthorizedCollection(Context context, String query)
-        throws SearchServiceException, SQLException {
+        throws SearchServiceException {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCollection.TYPE,
+                                                              IndexableCollection.TYPE, Constants.ADMIN,
+            null, null, null, null);
+        return discoverResult.getTotalSearchResults();
+    }
+
+    @Override
+    public long countAuthorizedByActionCollection(Context context, int[] actions, String query)
+        throws SearchServiceException {
+        query = formatCustomQuery(query);
+        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+                                                                   IndexableCollection.TYPE, actions,
             null, null, null, null);
         return discoverResult.getTotalSearchResults();
     }
@@ -880,13 +936,13 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
     }
 
-    private boolean performCheck(Context context, String query) throws SQLException {
+    private boolean performCheck(Context context, String query) {
         if (context.getCurrentUser() == null) {
             return false;
         }
 
         try {
-            DiscoverResult discoverResult = getDiscoverResult(context, query, null, null, null, null);
+            DiscoverResult discoverResult = getDiscoverResult(context, query, Constants.ADMIN, null, null, null, null);
             if (discoverResult.getTotalSearchResults() > 0) {
                 return true;
             }
@@ -898,16 +954,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return false;
     }
 
-    private DiscoverResult getDiscoverResult(Context context, String query, Integer offset, Integer limit,
-            String sortField, SORT_ORDER sortOrder)
-        throws SearchServiceException, SQLException {
-        String groupQuery = getGroupToQuery(groupService.allMemberGroups(context, context.getCurrentUser()));
+    private DiscoverResult getDiscoverResult(Context context, String query, int action, Integer offset, Integer limit,
+                                             String sortField, SORT_ORDER sortOrder) throws SearchServiceException {
+        return getDiscoverResult(context, query, new int[]{ action }, offset, limit, sortField, sortOrder);
+    }
+
+    private DiscoverResult getDiscoverResult(Context context, String query, int[] actions, Integer offset,
+                                             Integer limit, String sortField, SORT_ORDER sortOrder)
+        throws SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
-        if (!this.isAdmin(context)) {
-            query = query + " AND (" +
-                "admin:e" + context.getCurrentUser().getID() + groupQuery + ")";
-        }
         discoverQuery.setQuery(query);
         if (offset != null) {
             discoverQuery.setStart(offset);
@@ -919,20 +975,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             discoverQuery.setSortField(sortField, sortOrder);
         }
 
-        return searchService.search(context, discoverQuery);
-    }
-
-    private String getGroupToQuery(List<Group> groups) {
-        StringBuilder groupQuery = new StringBuilder();
-
-        if (groups != null) {
-            for (Group group: groups) {
-                groupQuery.append(" OR admin:g");
-                groupQuery.append(group.getID());
-            }
-        }
-
-        return groupQuery.toString();
+        return searchService.searchAuthorized(context, discoverQuery, actions);
     }
 
     private String formatCustomQuery(String query) {

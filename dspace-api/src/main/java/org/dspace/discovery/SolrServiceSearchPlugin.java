@@ -25,8 +25,10 @@ public interface SolrServiceSearchPlugin {
      * @param context The DSpace Context object.
      * @param discoveryQuery The discovery query object on which the solr query is based.
      * @param solrQuery The query that will be sent to solr and which may be edited by this plugin.
+     * @param actions List of id actions to apply to the query
      * @throws SearchServiceException Any checked exception that might happen in this plugin
      */
-    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery)
+    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery,
+                                           int[] actions)
             throws SearchServiceException;
 }
