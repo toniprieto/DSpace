@@ -53,7 +53,7 @@ public class SolrServiceWorkspaceWorkflowRestrictionPlugin implements SolrServic
 
     @Override
     public void additionalSearchParameters(
-            Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery
+            Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery, int[] actions
     ) throws SearchServiceException {
         boolean isWorkspace = StringUtils.startsWith(
                 discoveryQuery.getDiscoveryConfigurationName(),

@@ -801,7 +801,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                         if (AuthorizeConfiguration.canCollectionAdminManagePolicies()
                             || AuthorizeConfiguration.canCommunityAdminManagePolicies()
                             || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
-                            List<Group> groups = new ArrayList<>();
+                            Set<Group> groups = new HashSet<>();
                             groups.add(group);
                             List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
                                                             Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);

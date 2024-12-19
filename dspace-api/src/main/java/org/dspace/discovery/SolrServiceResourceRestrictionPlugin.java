@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -18,12 +19,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
-import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
@@ -83,7 +80,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
         }
         if (dso != null) {
             try {
-                List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
+                List<ResourcePolicy> policies = authorizeService.getPolicies(context, dso);
                 for (ResourcePolicy resourcePolicy : policies) {
                     if (resourcePolicyService.isDateValid(resourcePolicy)) {
                         String fieldValue;
@@ -95,38 +92,16 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                             fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
                         }
-
-                        document.addField("read", fieldValue);
+                        String actionName = getIndexedActionName(resourcePolicy.getAction());
+                        // Only index read, submit, edit and admin permissions
+                        if ("read".equals(actionName) || "submit".equals(actionName) || "edit".equals(actionName)
+                            || "admin".equals(actionName)) {
+                            document.addField(actionName, fieldValue);
+                        }
                     }
 
                     //remove the policy from the cache to save memory
                     context.uncacheEntity(resourcePolicy);
-                }
-                 // also index ADMIN policies as ADMIN permissions provides READ access
-                // going up through the hierarchy for communities, collections and items
-                while (dso != null) {
-                    if (dso instanceof Community || dso instanceof Collection || dso instanceof Item) {
-                        List<ResourcePolicy> policiesAdmin = authorizeService
-                                     .getPoliciesActionFilter(context, dso, Constants.ADMIN);
-                        for (ResourcePolicy resourcePolicy : policiesAdmin) {
-                            if (resourcePolicyService.isDateValid(resourcePolicy)) {
-                                String fieldValue;
-                                if (resourcePolicy.getGroup() != null) {
-                                    // We have a group add it to the value
-                                    fieldValue = "g" + resourcePolicy.getGroup().getID();
-                                } else {
-                                    // We have an eperson add it to the value
-                                    fieldValue = "e" + resourcePolicy.getEPerson().getID();
-                                }
-                                document.addField("read", fieldValue);
-                                document.addField("admin", fieldValue);
-                            }
-
-                            // remove the policy from the cache to save memory
-                            context.uncacheEntity(resourcePolicy);
-                        }
-                    }
-                    dso = ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getParentObject(context, dso);
                 }
             } catch (SQLException e) {
                 log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
@@ -137,35 +112,52 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     }
 
     @Override
-    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
+    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery,
+                                           int[] actions) {
         try {
             if (!authorizeService.isAdmin(context)) {
                 StringBuilder resourceQuery = new StringBuilder();
-                //Always add the anonymous group id to the query
-                Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-                String anonGroupId = "";
-                if (anonymousGroup != null) {
-                    anonGroupId = anonymousGroup.getID().toString();
-                }
-                resourceQuery.append("read:(g" + anonGroupId);
+
+                StringBuilder epersonAndGroupClause = new StringBuilder();
+
                 EPerson currentUser = context.getCurrentUser();
                 if (currentUser != null) {
-                    resourceQuery.append(" OR e").append(currentUser.getID());
+                    epersonAndGroupClause.append("e").append(currentUser.getID());
                 }
 
                 //Retrieve all the groups the current user is a member of !
                 Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
                 for (Group group : groups) {
-                    resourceQuery.append(" OR g").append(group.getID());
+                    if (!epersonAndGroupClause.isEmpty()) {
+                        epersonAndGroupClause.append(" OR g").append(group.getID());
+                    } else {
+                        epersonAndGroupClause.append("g").append(group.getID());
+                    }
                 }
 
-                resourceQuery.append(")");
+                // If a param action is included the filter should be something similar to: (read AND action) OR admin
+                if (actions.length == 0) {
+                    resourceQuery.append("(read:(").append(epersonAndGroupClause).append("))").append( " OR ")
+                        .append("admin:(").append(epersonAndGroupClause).append(")");
+                } else if (ArrayUtils.contains(actions, Constants.ADMIN)) {
+                    resourceQuery.append("admin:(").append(epersonAndGroupClause).append(")");
+                } else {
+                    resourceQuery.append("(read:(").append(epersonAndGroupClause).append(")");
+                    for (int action : actions) {
+                        String actionName = getIndexedActionName(action);
+                        resourceQuery.append(" AND ").append(actionName).append(":(").append(epersonAndGroupClause)
+                                    .append(")");
+                    }
+                    resourceQuery.append(")");
+                    resourceQuery.append(" OR ").append("admin:(")
+                        .append(epersonAndGroupClause).append(")");
+                }
 
                 String locations = DSpaceServicesFactory.getInstance()
                                                           .getServiceManager()
                                                           .getServiceByName(SearchService.class.getName(),
                                                                             SearchService.class)
-                                                          .createLocationQueryForAdministrableItems(context);
+                                                          .createLocationQueryForAdministrableItems(context, groups);
 
                 if (StringUtils.isNotBlank(locations)) {
                     resourceQuery.append(" OR ");
@@ -177,5 +169,18 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
         } catch (SQLException e) {
             log.error(LogHelper.getHeader(context, "Error while adding resource policy information to query", ""), e);
         }
+    }
+
+    private String getIndexedActionName(int action) {
+
+        String actionName = Constants.actionText[action];
+        actionName = actionName.toLowerCase();
+        if ("add".equals(actionName)) {
+            return "submit";
+        }
+        if ("write".equals(actionName)) {
+            return "edit";
+        }
+        return actionName;
     }
 }

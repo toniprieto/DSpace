@@ -9,6 +9,7 @@ package org.dspace.authorize.dao;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dspace.authorize.ResourcePolicy;
@@ -56,7 +57,7 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
     public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group,
                                                               int action, int notPolicyID) throws SQLException;
 
-    public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups,
+    public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, Set<Group> groups,
                                                                int action, int type_id) throws SQLException;
 
     public void deleteByDso(Context context, DSpaceObject dso) throws SQLException;

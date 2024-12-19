@@ -21,6 +21,7 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -182,10 +183,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
+            List<Collection> collections = cs.findCollectionsWithSubmit(context, q, com,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, com);
+            int tot = cs.countCollectionsWithSubmit(context, q, com);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -197,10 +198,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                                                 Pageable pageable) throws SearchServiceException {
         try {
             Context context = obtainContext();
-            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
+            List<Collection> collections = cs.findCollectionsWithSubmit(context, q, null,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, null);
+            int tot = cs.countCollectionsWithSubmit(context, q, null);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -211,16 +212,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @SearchRestMethod(name = "findAdminAuthorized")
     public Page<CollectionRest> findAdminAuthorized (
         Pageable pageable, @Parameter(value = "query") String query) {
-        try {
-            Context context = obtainContext();
-            List<Collection> collections = authorizeService.findAdminAuthorizedCollection(context, query,
-                Math.toIntExact(pageable.getOffset()),
-                Math.toIntExact(pageable.getPageSize()));
-            long tot = authorizeService.countAdminAuthorizedCollection(context, query);
-            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
-        } catch (SearchServiceException | SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        return findAuthorized(pageable, Constants.ADMIN, query);
     }
 
     /**
@@ -245,14 +237,61 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             if (entityType == null) {
                 throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
             }
-            List<Collection> collections = cs.findCollectionsWithSubmit(query, context, null, entityTypeLabel,
+            List<Collection> collections = cs.findCollectionsWithSubmit(context, query, null, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(query, context, null, entityTypeLabel);
+            int tot = cs.countCollectionsWithSubmit(context, query, null, entityTypeLabel);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Returns Collections for which the current user has 'edit' privileges.
+     *
+     * @param pageable              The pagination information
+     * @param query                 The query used in the lookup
+     * @return
+     */
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findEditAuthorized")
+    public Page<CollectionRest> findEditAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.WRITE, query);
+    }
+
+    private Page<CollectionRest> findAuthorized(Pageable pageable, int action, String query) {
+        try {
+            Context context = obtainContext();
+            query = getAutocompleteQuery(query);
+            List<Collection> collections = authorizeService.findAuthorizedByActionCollection(context, query,
+                action,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getPageSize()));
+            long tot = authorizeService.countAuthorizedByActionCollection(context, action, query);
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
+        } catch (SearchServiceException | SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Constructs the Solr query used for the collection autocomplete search.
+     * Utilizes the dc.title_sort field to handle spaces properly.
+     *
+     * @param query to search for
+     * @return the constructed solr query
+     */
+    private String getAutocompleteQuery(String query) {
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(query);
+            buildQuery.append("(").append(escapedQuery).append(" OR dc.title_sort:*")
+                .append(escapedQuery).append("*").append(")");
+            return buildQuery.toString();
+        }
+        return query;
     }
 
     /**
@@ -282,10 +321,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                 throw new ResourceNotFoundException(
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid + " not found");
             }
-            List<Collection> collections = cs.findCollectionsWithSubmit(query, context, community, entityTypeLabel,
+            List<Collection> collections = cs.findCollectionsWithSubmit(context, query, community, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
-            int total = cs.countCollectionsWithSubmit(query, context, community, entityTypeLabel);
+            int total = cs.countCollectionsWithSubmit(context, query, community, entityTypeLabel);
             return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
