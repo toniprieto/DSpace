@@ -38,6 +38,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -219,13 +220,35 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findAdminAuthorized")
     public Page<CommunityRest> findAdminAuthorized (
-        Pageable pageable, @Parameter(value = "query") String query) {
+        Pageable pageable, @Parameter(value = "query") String query,
+        @Parameter(value = "filterQuery") String filterQuery) {
+        return findAuthorized(pageable, Constants.ADMIN, query, filterQuery);
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findEditAuthorized")
+    public Page<CommunityRest> findEditAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query,
+        @Parameter(value = "filterQuery") String filterQuery) {
+        return findAuthorized(pageable, Constants.WRITE, query, filterQuery);
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findAddAuthorized")
+    public Page<CommunityRest> findAddAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query,
+        @Parameter(value = "filterQuery") String filterQuery) {
+        return findAuthorized(pageable, Constants.ADD, query, filterQuery);
+    }
+
+    private Page<CommunityRest> findAuthorized(Pageable pageable, int action, String query, String filterQuery) {
         try {
             Context context = obtainContext();
-            List<Community> communities = authorizeService.findAdminAuthorizedCommunity(context, query,
+            List<Community> communities = authorizeService.findAuthorizedByActionCommunity(context, query,
+                filterQuery, action,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
-            long tot = authorizeService.countAdminAuthorizedCommunity(context, query);
+            long tot = authorizeService.countAuthorizedByActionCommunity(context, query, filterQuery, action);
             return converter.toRestPage(communities, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

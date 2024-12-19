@@ -537,13 +537,30 @@ public interface AuthorizeService {
      *
      * @param context   context with the current user
      * @param query     the query for which to filter the results more
+     * @param filterQuery the solr filter query to limit the results
      * @param offset    used for pagination of the results
      * @param limit     used for pagination of the results
      * @return          the number of matching communities
      * @throws SearchServiceException
      * @throws SQLException
      */
-    List<Community> findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
+    List<Community> findAdminAuthorizedCommunity(Context context, String query, String filterQuery, int offset,
+                                                 int limit) throws SearchServiceException, SQLException;
+
+    /**
+     *  Finds communities for which the logged in user has the rights specified by the action parameter.
+     *
+     * @param context   the context whose user is checked against
+     * @param query     the optional extra query
+     * @param filterQuery the solr filter query to limit the results
+     * @param action    the action to check for
+     * @param offset    the offset for pagination
+     * @param limit     the amount of dso's to return
+     * @return          a list of communities for which the logged in user has the rights specified by the action
+     * @throws SearchServiceException
+     */
+    List<Community> findAuthorizedByActionCommunity(Context context, String query, String filterQuery, int action,
+                                                    int offset, int limit)
         throws SearchServiceException, SQLException;
 
     /**
@@ -551,25 +568,57 @@ public interface AuthorizeService {
      *
      * @param context   context with the current user
      * @param query     the query for which to filter the results more
+     * @param filterQuery the solr filter query to limit the results
      * @return          the matching communities
      * @throws SearchServiceException
      * @throws SQLException
      */
-    long countAdminAuthorizedCommunity(Context context, String query)
+    long countAdminAuthorizedCommunity(Context context, String query, String filterQuery)
         throws SearchServiceException, SQLException;
+
+    /**
+     * Counts communities for which the current user has the rights specified by the action parameter.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param filterQuery the solr filter query to limit the results
+     * @param action    the action to check for
+     * @return          the matching communities
+     * @throws SearchServiceException
+     */
+    long countAuthorizedByActionCommunity(Context context, String query, String filterQuery, int action)
+        throws SearchServiceException;
 
     /**
      * Finds collections for which the current user is admin, AND which match the query.
      *
      * @param context   context with the current user
      * @param query     the query for which to filter the results more
+     * @param filterQuery the solr filter query to limit the results
      * @param offset    used for pagination of the results
      * @param limit     used for pagination of the results
      * @return          the matching collections
      * @throws SearchServiceException
      * @throws SQLException
      */
-    List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
+    List<Collection> findAdminAuthorizedCollection(Context context, String query, String filterQuery, int offset,
+                                                   int limit)
+        throws SearchServiceException, SQLException;
+
+    /**
+     * Finds collections for which the current user has the rights specified by the action parameter.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param filterQuery the solr filter query to limit the results
+     * @param actions   the actions to check for
+     * @param offset    used for pagination of the results
+     * @param limit     used for pagination of the results
+     * @return          the matching collections
+     * @throws SearchServiceException
+     */
+    List<Collection> findAuthorizedByActionCollection(Context context, String query, String filterQuery, int[] actions,
+                                                      int offset, int limit)
         throws SearchServiceException, SQLException;
 
     /**
@@ -577,11 +626,25 @@ public interface AuthorizeService {
      *
      * @param context   context with the current user
      * @param query     the query for which to filter the results more
+     * @param filterQuery the solr filter query to limit the results
      * @return          the number of matching collections
      * @throws SearchServiceException
      * @throws SQLException
      */
-    long countAdminAuthorizedCollection(Context context, String query)
+    long countAdminAuthorizedCollection(Context context, String query, String filterQuery)
+        throws SearchServiceException, SQLException;
+
+    /**
+     * Counts collections for which the current user has the rights specified by the action parameter.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param filterQuery the solr filter query to limit the results
+     * @param actions   the actions to check for
+     * @return          the number of matching collections
+     * @throws SearchServiceException
+     */
+    long countAuthorizedByActionCollection(Context context, String query, String filterQuery, int[] actions)
         throws SearchServiceException, SQLException;
 
     /**

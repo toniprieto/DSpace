@@ -915,23 +915,25 @@ public interface ItemService
     /**
       * finds all items for which the current user has editing rights
       * @param context DSpace context object
+      * @param q      limit the returned items to those matching this query
+      * @param fq     the solr filter query used to limit the returned items
       * @param offset page offset
       * @param limit  page size limit
       * @return list of items for which the current user has editing rights
-      * @throws SQLException
       * @throws SearchServiceException
       */
-    List<Item> findItemsWithEdit(Context context, int offset, int limit)
-        throws SQLException, SearchServiceException;
+    List<Item> findItemsWithEdit(Context context, String q, String fq, int offset, int limit)
+        throws SearchServiceException;
 
     /**
     * counts all items for which the current user has editing rights
     * @param context DSpace context object
+    * @param q       limit the counted items to those matching this query
+    * @param fq      the solr filter query used to limit the counted items
     * @return list of items for which the current user has editing rights
-    * @throws SQLException
     * @throws SearchServiceException
     */
-    int countItemsWithEdit(Context context) throws SQLException, SearchServiceException;
+    int countItemsWithEdit(Context context, String q, String fq) throws SearchServiceException;
 
     /**
      * Check if the supplied item is an inprogress submission
