@@ -62,9 +62,6 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     @Autowired(required = true)
     protected ResourcePolicyService resourcePolicyService;
 
-    // Only index read, submit, edit and admin permissions
-    protected int[] actionsToIndex = new int[] { Constants.READ, Constants.WRITE, Constants.ADD, Constants.ADMIN };
-
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
         DSpaceObject dso = null;
@@ -83,6 +80,9 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
         }
         if (dso != null) {
             try {
+                // Only index read, submit, edit and admin permissions
+                int[] actionsToIndex = new int[] { Constants.READ, Constants.WRITE, Constants.ADD, Constants.ADMIN };
+
                 for (int action : actionsToIndex) {
                     String indexedActionName = getIndexedActionName(action);
                     List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, action);

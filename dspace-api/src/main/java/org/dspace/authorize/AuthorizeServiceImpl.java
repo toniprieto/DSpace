@@ -732,7 +732,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @param context   context with the current user
      * @return          true if the current user is a community admin in the site
      *                  false when this is not the case, or an exception occurred
-     * @throws java.sql.SQLException passed through.
      */
     @Override
     public boolean isCommunityAdmin(Context context) throws SQLException {
@@ -745,10 +744,9 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @param context   context with the current user
      * @return          true if the current user is a collection admin in the site
      *                  false when this is not the case, or an exception occurred
-     * @throws java.sql.SQLException passed through.
      */
     @Override
-    public boolean isCollectionAdmin(Context context) throws SQLException {
+    public boolean isCollectionAdmin(Context context) {
         return performCheck(context, "search.resourcetype:" + IndexableCollection.TYPE);
     }
 
@@ -758,7 +756,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @param context   context with the current user
      * @return          true if the current user is an item admin in the site
      *                  false when this is not the case, or an exception occurred
-     * @throws java.sql.SQLException passed through.
      */
     @Override
     public boolean isItemAdmin(Context context) {
@@ -771,7 +768,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @param context   context with the current user
      * @return          true if the current user is a community or collection admin in the site
      *                  false when this is not the case, or an exception occurred
-     * @throws java.sql.SQLException passed through.
      */
     @Override
     public boolean isComColAdmin(Context context) {
@@ -805,6 +801,17 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return communities;
     }
 
+    /**
+     *  Finds communities for which the logged in user has the rights specified by the action parameter.
+     *
+     * @param context   the context whose user is checked against
+     * @param query     the optional extra query
+     * @param action    the action to check for
+     * @param offset    the offset for pagination
+     * @param limit     the amount of dso's to return
+     * @return          a list of communities for which the logged in user has the rights specified by the action
+     * @throws SearchServiceException
+     */
     @Override
     public List<Community> findAuthorizedByActionCommunity(Context context, String query, int action, int offset,
                                                            int limit)
@@ -839,6 +846,15 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return discoverResult.getTotalSearchResults();
     }
 
+    /**
+     * Counts communities for which the current user has the rights specified by the action parameter.
+     *
+     * @param context   context with the current user
+     * @param action    the action to check for
+     * @param query     the query for which to filter the results more
+     * @return          the matching communities
+     * @throws SearchServiceException
+     */
     @Override
     public long countAuthorizedByActionCommunity(Context context, int action, String query)
         throws SearchServiceException {
@@ -878,6 +894,17 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return collections;
     }
 
+    /**
+     *  Finds collections for which the logged in user has the rights specified by the action parameter.
+     *
+     * @param context   the context whose user is checked against
+     * @param query     the optional extra query
+     * @param actions   the actions to check for
+     * @param offset    the offset for pagination
+     * @param limit     the amount of dso's to return
+     * @return          a list of collections for which the logged in user has the rights specified by the action
+     * @throws SearchServiceException
+     */
     @Override
     public List<Collection> findAuthorizedByActionCollection(Context context, String query, int[] actions, int offset,
                                                              int limit)
@@ -916,6 +943,15 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return discoverResult.getTotalSearchResults();
     }
 
+    /**
+     * Counts collections for which the current user has the rights specified by the action parameter.
+     *
+     * @param context   context with the current user
+     * @param actions   the actions to check for
+     * @param query     the query for which to filter the results more
+     * @return          the matching collections
+     * @throws SearchServiceException
+     */
     @Override
     public long countAuthorizedByActionCollection(Context context, int[] actions, String query)
         throws SearchServiceException {
