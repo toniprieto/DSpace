@@ -734,7 +734,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      *                  false when this is not the case, or an exception occurred
      */
     @Override
-    public boolean isCommunityAdmin(Context context) throws SQLException {
+    public boolean isCommunityAdmin(Context context) {
         return performCheck(context, "search.resourcetype:" + IndexableCommunity.TYPE);
     }
 
