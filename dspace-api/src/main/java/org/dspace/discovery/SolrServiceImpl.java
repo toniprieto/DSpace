@@ -603,39 +603,27 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                                                                     groupList, Constants.ADMIN,
                                                                                     Constants.COLLECTION);
 
-            List<Collection> allCollections = new ArrayList<>();
-
-            for (ResourcePolicy rp : collectionsPolicies) {
-                Collection collection = ContentServiceFactory.getInstance().getCollectionService()
-                                                             .find(context, rp.getdSpaceObject().getID());
-                allCollections.add(collection);
-            }
-
-            if (CollectionUtils.isNotEmpty(communitiesPolicies) || CollectionUtils.isNotEmpty(allCollections)) {
+            if (CollectionUtils.isNotEmpty(communitiesPolicies) || CollectionUtils.isNotEmpty(collectionsPolicies)) {
                 locationQuery.append("location:( ");
 
                 for (int i = 0; i < communitiesPolicies.size(); i++) {
                     ResourcePolicy rp = communitiesPolicies.get(i);
-                    Community community = ContentServiceFactory.getInstance().getCommunityService()
-                                                               .find(context, rp.getdSpaceObject().getID());
-
-                    locationQuery.append("m").append(community.getID());
+                    locationQuery.append("m").append(rp.getdSpaceObject().getID());
 
                     if (i != (communitiesPolicies.size() - 1)) {
                         locationQuery.append(" OR ");
                     }
                 }
 
-                Iterator<Collection> collIter = allCollections.iterator();
-
-                if (!communitiesPolicies.isEmpty() && !allCollections.isEmpty()) {
+                if (!communitiesPolicies.isEmpty() && !collectionsPolicies.isEmpty()) {
                     locationQuery.append(" OR ");
                 }
 
-                while (collIter.hasNext()) {
-                    locationQuery.append("l").append(collIter.next().getID());
+                for (int i = 0; i < collectionsPolicies.size(); i++) {
+                    ResourcePolicy rp = collectionsPolicies.get(i);
+                    locationQuery.append("l").append(rp.getdSpaceObject().getID());
 
-                    if (collIter.hasNext()) {
+                    if (i != (collectionsPolicies.size() - 1)) {
                         locationQuery.append(" OR ");
                     }
                 }
