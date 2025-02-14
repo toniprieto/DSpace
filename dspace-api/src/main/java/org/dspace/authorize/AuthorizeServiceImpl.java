@@ -964,12 +964,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     @Override
     public boolean isAccountManager(Context context) {
-        try {
-            return (canCommunityAdminManageAccounts() && isCommunityAdmin(context)
+        return (canCommunityAdminManageAccounts() && isCommunityAdmin(context)
                 || canCollectionAdminManageAccounts() && isCollectionAdmin(context));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private boolean performCheck(Context context, String query) {
