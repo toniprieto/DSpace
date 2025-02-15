@@ -997,7 +997,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery(query);
-        if (StringUtils.isNoneBlank(filterQuery)) {
+        if (StringUtils.isNotBlank(filterQuery)) {
             discoverQuery.addFilterQueries(filterQuery);
         }
         if (offset != null) {
