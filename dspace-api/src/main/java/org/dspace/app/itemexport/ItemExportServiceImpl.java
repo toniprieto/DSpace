@@ -118,6 +118,9 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void exportItem(Context c, Iterator<Item> i,
                            String destDirName, int seqStart, boolean migrate,
                            boolean excludeBitstreams) throws Exception {
+        Context.Mode originalMode = c.getCurrentMode();
+        c.setMode(Context.Mode.READ_ONLY);
+
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
         int subDirSuffix = 0;
@@ -151,6 +154,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             c.uncacheEntity(item);
             mySequenceNumber++;
         }
+        c.setMode(originalMode);
     }
 
     protected void exportItem(Context c, Item myItem, String destDirName,
