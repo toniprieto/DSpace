@@ -124,6 +124,10 @@ public class EmbedRelsProjection extends AbstractProjection {
         return embedSizes;
     }
 
+    public Set<String> getEmbedRels() {
+        return embedRels;
+    }
+
     public void setEmbedSizes(final Map<String, Integer> embedSizes) {
         this.embedSizes = embedSizes;
     }
