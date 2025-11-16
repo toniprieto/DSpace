@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +16,7 @@ import org.dspace.app.rest.model.AInprogressSubmissionRest;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
+import org.dspace.app.rest.projection.EmbedRelsProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.DataProcessingStep;
 import org.dspace.app.rest.submit.RestProcessingStep;
@@ -75,7 +77,17 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         // 2. iterate over the submission section to allow to plugin additional
         // info
 
-        if (collection != null) {
+        boolean conainsThumbanil = false;
+        if (projection instanceof EmbedRelsProjection) {
+            EmbedRelsProjection embedProjection = (EmbedRelsProjection) projection;
+            Set<String> embedRels = embedProjection.getEmbedRels();
+            log.info(embedRels);
+            if (embedRels.contains("thumbnail")) {
+                conainsThumbanil = true;
+            }
+        }
+
+        if (collection != null && !conainsThumbanil) {
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigService.getSubmissionConfigByCollection(collection), projection);
             witem.setSubmissionDefinition(def);
