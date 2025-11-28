@@ -275,10 +275,10 @@
     <field name="search.entitytype" type="string" indexed="true" stored="true" required="false" />
    
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
-    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
-    <field name="location.comm" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
-    <field name="location.coll" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
-    <field name="location.parent" type="lowerCaseSort" indexed="true" stored="true" multiValued="false" required="false" omitNorms="true" />
+    <field name="location" type="string" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" docValues="true" />
+    <field name="location.comm" type="string" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" docValues="true" />
+    <field name="location.coll" type="string" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" docValues="true" />
+    <field name="location.parent" type="string" indexed="true" stored="true" multiValued="false" required="false" omitNorms="true" docValues="true" />
   
     <field name="a_spell" type="textSpell" />
     <copyField source="fulltext" dest="a_spell" />
