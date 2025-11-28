@@ -129,7 +129,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
                 for (Group group : groups) {
                     if (!epersonAndGroupClause.isEmpty()) {
-                        epersonAndGroupClause.append(" OR g").append(group.getID());
+                        epersonAndGroupClause.append(",g").append(group.getID());
                     } else {
                         epersonAndGroupClause.append("g").append(group.getID());
                     }
@@ -151,22 +151,22 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                  */
                 if (actions.isEmpty()) {
                     // If no actions are included, we only check for read permissions
-                    resourceQuery.append("(read:(").append(epersonAndGroupClause).append("))").append( " OR ")
-                        .append("admin:(").append(epersonAndGroupClause).append(")");
+                    resourceQuery.append("{!terms f=read}").append(epersonAndGroupClause).append( " OR ")
+                        .append("{!terms f=admin}").append(epersonAndGroupClause).append(")");
                 } else if (actions.contains(Constants.ADMIN)) {
                     // If the actions array contains the admin action, we only check for admin permissions
-                    resourceQuery.append("admin:(").append(epersonAndGroupClause).append(")");
+                    resourceQuery.append("{!terms f=admin}").append(epersonAndGroupClause);
                 } else {
                     // If the actions array contains other actions, we check for read permissions and the actions passed
-                    resourceQuery.append("(read:(").append(epersonAndGroupClause).append(")");
+                    resourceQuery.append("({!terms f=read}").append(epersonAndGroupClause);
                     for (int action : actions) {
                         String actionName = getIndexedActionName(action);
-                        resourceQuery.append(" AND ").append(actionName).append(":(").append(epersonAndGroupClause)
-                            .append(")");
+                        resourceQuery.append(" AND ").append("{!terms f=").append(actionName).append("}")
+                            .append(epersonAndGroupClause);
                     }
                     resourceQuery.append(")");
-                    resourceQuery.append(" OR ").append("admin:(")
-                        .append(epersonAndGroupClause).append(")");
+                    resourceQuery.append(" OR ").append("{!terms f=admin}")
+                        .append(epersonAndGroupClause);
                 }
 
                 // Add to the query the locations the user has administrative rights on to cover the cases of

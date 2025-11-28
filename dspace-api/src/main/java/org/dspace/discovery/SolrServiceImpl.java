@@ -620,7 +620,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
             solrQuery.addFilterQuery("(" + SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableCommunity.TYPE + " OR "
                 + SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableCollection.TYPE + ")");
-            solrQuery.addFilterQuery("admin:(" + epersonAndGroupClause + ")");
+            solrQuery.addFilterQuery("{!terms f=admin}" + epersonAndGroupClause);
             solrQuery.setRows(Integer.MAX_VALUE);
 
             QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
