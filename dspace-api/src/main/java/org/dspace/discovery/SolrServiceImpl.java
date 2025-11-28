@@ -637,9 +637,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                 }
                 if (!containerUUIDs.isEmpty()) {
-                    locationQuery.append("location:(");
-                    locationQuery.append(String.join(" OR ", containerUUIDs));
-                    return locationQuery.append(")").toString();
+                    locationQuery.append("({!terms f=location}");
+                    locationQuery.append(String.join(",", containerUUIDs)).append(")");
+                    return locationQuery.toString();
                 }
             }
         } catch (Exception e) {
