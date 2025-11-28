@@ -152,13 +152,14 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 if (actions.isEmpty()) {
                     // If no actions are included, we only check for read permissions
                     resourceQuery.append("{!terms f=read}").append(epersonAndGroupClause).append( " OR ")
-                        .append("{!terms f=admin}").append(epersonAndGroupClause).append(")");
+                        .append("{!terms f=admin}").append(epersonAndGroupClause);
                 } else if (actions.contains(Constants.ADMIN)) {
                     // If the actions array contains the admin action, we only check for admin permissions
                     resourceQuery.append("{!terms f=admin}").append(epersonAndGroupClause);
                 } else {
                     // If the actions array contains other actions, we check for read permissions and the actions passed
-                    resourceQuery.append("({!terms f=read}").append(epersonAndGroupClause);
+                    resourceQuery.append("(");
+                    resourceQuery.append("{!terms f=read}").append(epersonAndGroupClause);
                     for (int action : actions) {
                         String actionName = getIndexedActionName(action);
                         resourceQuery.append(" AND ").append("{!terms f=").append(actionName).append("}")
