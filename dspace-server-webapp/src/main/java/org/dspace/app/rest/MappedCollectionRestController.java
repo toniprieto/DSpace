@@ -148,7 +148,7 @@ public class MappedCollectionRestController {
             UUID owningCollectionUuid = item.getOwningCollection().getID();
             this.checkIfOwningCollection(item, collectionUuid);
             if (collection.getID() != owningCollectionUuid && item.getCollections().contains(collection)) {
-                collectionService.removeItem(context, collection, item);
+                collectionService.removeItem(context, collection, item, false);
                 collectionService.update(context, collection);
                 itemService.update(context, item);
                 context.commit();

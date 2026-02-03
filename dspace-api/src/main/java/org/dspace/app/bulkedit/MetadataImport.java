@@ -1036,7 +1036,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         if (change) {
             // Remove old mapped collections
             for (Collection collection : bechange.getOldMappedCollections()) {
-                collectionService.removeItem(c, collection, item);
+                collectionService.removeItem(c, collection, item, false);
             }
 
             // Add to new owned collection
@@ -1056,7 +1056,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 }
 
                 if (found) {
-                    collectionService.removeItem(c, bechange.getOldOwningCollection(), item);
+                    collectionService.removeItem(c, bechange.getOldOwningCollection(), item, false);
                 }
             }
 

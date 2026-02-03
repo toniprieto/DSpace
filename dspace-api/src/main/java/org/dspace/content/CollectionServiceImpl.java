@@ -649,13 +649,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public void removeItem(Context context, Collection collection, Item item)
+    public void removeItem(Context context, Collection collection, Item item, boolean deleteItemIfOrphaned)
         throws SQLException, AuthorizeException, IOException {
         // Check authorisation
         authorizeService.authorizeAction(context, collection, Constants.REMOVE);
 
         //Check if we orphaned our poor item
         if (item.getCollections().size() == 1) {
+            if (!deleteItemIfOrphaned) {
+                throw new IllegalStateException(
+                    "Cannot remove item " + item.getID() + " from collection " + collection.getID()
+                        + " because this would orphan the item");
+            }
             // Orphan; delete it
             itemService.delete(context, item);
         } else {
@@ -767,7 +772,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 itemService.delete(context, item);
             } else {
                 // the item was only mapped to this collection, so just remove it
-                removeItem(context, collection, item);
+                removeItem(context, collection, item, true);
             }
         }
 

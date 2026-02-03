@@ -673,7 +673,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Now, delete that one item
         log.info("testReplaceCollectionHierarchy() - DELETE Item");
-        collectionService.removeItem(context, parent, itemToDelete);
+        collectionService.removeItem(context, parent, itemToDelete, true);
 
         // Assert the deleted item no longer exists
         DSpaceObject obj = handleService.resolveToObject(context, deletedItemHandle);
@@ -774,7 +774,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Now, delete that item
         log.info("testRestoreItem() - DELETE Item");
-        collectionService.removeItem(context, parent, testItem);
+        collectionService.removeItem(context, parent, testItem, true);
 
         // Assert the deleted item no longer exists
         DSpaceObject obj = handleService.resolveToObject(context, testItemHandle);
@@ -836,7 +836,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Now, delete that item
         log.info("testRestoreRestrictedItem() - DELETE Item");
-        collectionService.removeItem(context, parent, item);
+        collectionService.removeItem(context, parent, item, true);
 
         // Assert the deleted item no longer exists
         DSpaceObject obj = handleService.resolveToObject(context, itemHandle);
@@ -900,7 +900,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Now, delete that item
         log.info("testRestoreItemNoPolicies() - DELETE Item");
-        collectionService.removeItem(context, parent, item);
+        collectionService.removeItem(context, parent, item, true);
 
         // Assert the deleted item no longer exists
         DSpaceObject obj = handleService.resolveToObject(context, itemHandle);

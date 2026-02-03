@@ -296,12 +296,14 @@ public interface CollectionService
      * @param context    DSpace Context
      * @param collection Collection
      * @param item       item to remove
+     * @param deleteItemIfOrphaned if `true`, deletes the item if it becomes orphaned (has no associated collections),
+     *                            if `false`, if it would become orphaned, throws an exception
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      * @throws IOException        if IO error
      */
-    public void removeItem(Context context, Collection collection, Item item) throws SQLException, AuthorizeException,
-        IOException;
+    public void removeItem(Context context, Collection collection, Item item, boolean deleteItemIfOrphaned)
+        throws SQLException, AuthorizeException, IOException;
 
     public boolean canEditBoolean(Context context, Collection collection) throws SQLException;
 

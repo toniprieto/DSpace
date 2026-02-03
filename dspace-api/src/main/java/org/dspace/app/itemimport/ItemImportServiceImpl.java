@@ -843,7 +843,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             // Remove item from all the collections it's in
             for (Collection collection : removeList) {
-                collectionService.removeItem(c, collection, myitem);
+                collectionService.removeItem(c, collection, myitem, true);
             }
         }
     }

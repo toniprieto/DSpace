@@ -1170,7 +1170,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Move the Item from one Collection to the other
         collectionService.addItem(context, to, item);
-        collectionService.removeItem(context, from, item);
+        collectionService.removeItem(context, from, item, false);
 
         // If we are moving from the owning collection, update that too
         if (isOwningCollection(item, from)) {

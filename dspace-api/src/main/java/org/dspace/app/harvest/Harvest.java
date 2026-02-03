@@ -336,7 +336,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                 i++;
                 Item item = it.next();
                 handler.logInfo("Deleting: " + item.getHandle());
-                collectionService.removeItem(context, collection, item);
+                collectionService.removeItem(context, collection, item, true);
                 context.uncacheEntity(item);// Dispatch events every 50 items
                 if (i % 50 == 0) {
                     context.dispatchEvents();

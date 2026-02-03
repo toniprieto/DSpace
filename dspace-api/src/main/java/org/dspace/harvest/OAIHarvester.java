@@ -505,7 +505,7 @@ public class OAIHarvester {
         if (header.getAttribute("status") != null && header.getAttribute("status").getValue().equals("deleted")) {
             log.info("Item " + itemOaiID + " has been marked as deleted on the OAI server.");
             if (item != null) {
-                collectionService.removeItem(ourContext, targetCollection, item);
+                collectionService.removeItem(ourContext, targetCollection, item, true);
             }
 
             ourContext.restoreAuthSystemState();

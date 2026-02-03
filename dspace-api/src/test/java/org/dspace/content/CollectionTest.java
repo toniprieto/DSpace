@@ -738,7 +738,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         collectionService.addItem(context, collection, item);
         context.restoreAuthSystemState();
 
-        collectionService.removeItem(context, collection, item);
+        collectionService.removeItem(context, collection, item, true);
         boolean isthere = false;
         Iterator<Item> ii = itemService.findByCollection(context, collection);
         while (ii.hasNext()) {
@@ -765,7 +765,32 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         collectionService.addItem(context, collection, item);
         context.restoreAuthSystemState();
 
-        collectionService.removeItem(context, collection, item);
+        collectionService.removeItem(context, collection, item, true);
+        fail("Exception expected");
+    }
+
+    /**
+     * Test of removeItem method avoiding deletion, of class Collection.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testRemoveItemAvoidDeletionIfOrphaned() throws Exception {
+        // Allow Collection REMOVE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.REMOVE);
+        // Allow Item DELETE perms
+        doNothing().when(authorizeServiceSpy)
+            .authorizeAction(any(Context.class), any(Item.class), eq(Constants.DELETE));
+        // Allow Item REMOVE perms
+        doNothing().when(authorizeServiceSpy)
+            .authorizeAction(any(Context.class), any(Item.class), eq(Constants.REMOVE));
+
+        // create & add item first
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        Item item = installItemService.installItem(context, workspaceItem);
+        collectionService.addItem(context, collection, item);
+        context.restoreAuthSystemState();
+
+        collectionService.removeItem(context, collection, item, false);
         fail("Exception expected");
     }
 

@@ -154,7 +154,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
             collection = collectionService.find(context, collection.getID());
             owningCommunity = communityService.find(context, owningCommunity.getID());
 
-            collectionService.removeItem(context, collection, item);
+            collectionService.removeItem(context, collection, item, true);
             communityService.removeCollection(context, owningCommunity, collection);
             communityService.delete(context, owningCommunity);
             context.restoreAuthSystemState();
