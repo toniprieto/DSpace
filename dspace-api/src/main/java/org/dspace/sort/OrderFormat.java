@@ -40,6 +40,7 @@ public class OrderFormat {
     public static final String TEXT = "text";
     public static final String DATE = "date";
     public static final String AUTHORITY = "authority";
+    public static final String FACET = "facet";
 
     // Array of all available order delegates - avoids excessive calls to plugin manager
     private static final String[] delegates = CoreServiceFactory.getInstance().getPluginService()
@@ -50,6 +51,7 @@ public class OrderFormat {
     private static final OrderFormatDelegate textDelegate = new OrderFormatText();
     private static final OrderFormatDelegate dateDelegate = new OrderFormatDate();
     private static final OrderFormatDelegate authorityDelegate = new OrderFormatText();
+    private static final OrderFormatDelegate facetDelegate = new OrderFormatFacet();
 
     /**
      * Default constructor
@@ -104,6 +106,10 @@ public class OrderFormat {
 
             if (type.equalsIgnoreCase(OrderFormat.AUTHORITY)) {
                 return authorityDelegate.makeSortString(value, language);
+            }
+
+            if (type.equalsIgnoreCase(OrderFormat.FACET)) {
+                return facetDelegate.makeSortString(value, language);
             }
         }
 

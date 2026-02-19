@@ -933,7 +933,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                        String.valueOf(facetFieldConfig.getOffset()));
                 }
                 if (facetFieldConfig.getPrefix() != null) {
-                    solrQuery.setFacetPrefix(field, facetFieldConfig.getPrefix());
+                    solrQuery.setFacetPrefix(field, SearchUtils.normalizeFacetValue(facetFieldConfig.getPrefix()));
                 }
             }
         }

@@ -703,12 +703,12 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             //Solr has issues with facet prefix and cases
             if (authority != null) {
                 String facetValue = preferedLabel != null ? preferedLabel : value;
-                doc.addField(searchFilter.getIndexFieldName() + "_filter", facetValue
-                    .toLowerCase() + separator + facetValue + SearchUtils.AUTHORITY_SEPARATOR
+                doc.addField(searchFilter.getIndexFieldName() + "_filter", SearchUtils
+                    .normalizeFacetValue(facetValue) + separator + facetValue + SearchUtils.AUTHORITY_SEPARATOR
                     + authority);
             } else {
                 doc.addField(searchFilter.getIndexFieldName() + "_filter",
-                             value.toLowerCase() + separator + value);
+                             SearchUtils.normalizeFacetValue(value) + separator + value);
             }
             //Also add prefix field with all parts of value
             saveFacetPrefixParts(doc, searchFilter, value, separator, authority, preferedLabel);
@@ -769,11 +769,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
                 String indexValue = valueBuilder.toString().trim();
                 doc.addField(searchFilter.getIndexFieldName() + "_tax_" + i + "_filter",
-                             indexValue.toLowerCase() + separator + indexValue);
+                             SearchUtils.normalizeFacetValue(indexValue) + separator + indexValue);
                 //We add the field x times that it has occurred
                 for (int j = i; j < subValues.length; j++) {
                     doc.addField(searchFilter.getIndexFieldName() + "_filter",
-                                 indexValue.toLowerCase() + separator + indexValue);
+                                 SearchUtils.normalizeFacetValue(indexValue) + separator + indexValue);
                     doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
                 }
             }
@@ -810,11 +810,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             if (authority != null) {
                 String facetValue = preferedLabel != null ? preferedLabel : currentPart;
                 doc.addField(searchFilter.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES,
-                             facetValue.toLowerCase() + separator + value
+                             SearchUtils.normalizeFacetValue(facetValue) + separator + value
                                  + SearchUtils.AUTHORITY_SEPARATOR + authority);
             } else {
                 doc.addField(searchFilter.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES,
-                             currentPart.toLowerCase() + separator + value);
+                    SearchUtils.normalizeFacetValue(currentPart) + separator + value);
             }
         }
     }

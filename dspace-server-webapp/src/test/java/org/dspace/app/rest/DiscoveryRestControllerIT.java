@@ -776,6 +776,82 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
     }
 
+    @Test
+    public void discoverFacetsWithPrefix_AccentsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection").build();
+
+        // Item 1: Accented, Title Case
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Item 1")
+            .withAuthor("García, Juan")
+            .withSubject("Educación")
+            .build();
+
+        // Item 2: No Accents, Upper Author, Lower Subject
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Item 2")
+            .withAuthor("GARCIA, DIEGO")
+            .withSubject("educacion")
+            .build();
+
+        // Item 3: Accented (Müller and Informática)
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Item 3")
+            .withAuthor("Müller, Hans")
+            .withSubject("Informática")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        // Test Author Prefix: garcia (no accent) -> should find García, Juan and
+        // GARCIA, DIEGO
+        getClient().perform(get("/api/discover/facets/author")
+                .param("prefix", "garcia"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                FacetValueMatcher.entryFacetWithoutSelfLink("García, Juan"),
+                FacetValueMatcher.entryFacetWithoutSelfLink("GARCIA, DIEGO"))));
+
+        // Test Author Prefix: GARCÍA (accent/caps) -> should find García, Juan and
+        // GARCIA, DIEGO
+        getClient().perform(get("/api/discover/facets/author")
+                .param("prefix", "GARCÍA"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                FacetValueMatcher.entryFacetWithoutSelfLink("García, Juan"),
+                FacetValueMatcher.entryFacetWithoutSelfLink("GARCIA, DIEGO"))));
+
+        // Test Author Prefix: muller (no accent) -> should find Müller, Hans
+        getClient().perform(get("/api/discover/facets/author")
+                .param("prefix", "muller"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                FacetValueMatcher.entryFacetWithoutSelfLink("Müller, Hans"))));
+
+        // Test Subject Prefix: educacion (no accent) -> should find Educación and
+        // educacion
+        getClient().perform(get("/api/discover/facets/subject")
+                .param("prefix", "educacion"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                FacetValueMatcher.entryFacetWithoutSelfLink("Educación"),
+                FacetValueMatcher.entryFacetWithoutSelfLink("educacion"))));
+
+        // Test Subject Prefix: EDUCACIÓN (accent/caps) -> should find Educación and
+        // educacion
+        getClient().perform(get("/api/discover/facets/subject")
+                .param("prefix", "EDUCACIÓN"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                FacetValueMatcher.entryFacetWithoutSelfLink("Educación"),
+                FacetValueMatcher.entryFacetWithoutSelfLink("educacion"))));
+    }
 
     @Test
     public void discoverFacetsTestWithSimpleQueryAndSearchFilter() throws Exception {

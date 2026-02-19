@@ -26,6 +26,7 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.utils.DiscoverQueryBuilder;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.sort.OrderFormat;
 import org.dspace.workflow.WorkflowItem;
 
 /**
@@ -257,5 +258,18 @@ public class SearchUtils {
         ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
         return manager
             .getServiceByName(DiscoverQueryBuilder.class.getName(), DiscoverQueryBuilder.class);
+    }
+
+    /**
+     * Normalizes a facet value to ensure consistent ordering and filtering.
+     * This may include transformations such as converting the value to lowercase
+     * or removing diacritical marks.
+     * The normalization logic is delegated to the OrderFormat class based on the Facet type.
+     *
+     * @param value the facet value to normalize
+     * @return the normalized facet value
+     */
+    public static String normalizeFacetValue(String value) {
+        return OrderFormat.makeSortString(value, null, OrderFormat.FACET);
     }
 }
