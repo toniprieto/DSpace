@@ -20,7 +20,6 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -49,9 +48,6 @@ public class CanManageMappingsFeature implements AuthorizationFeature {
     @Autowired
     private ItemService itemService;
 
-    @Autowired
-    private CollectionService collectionService;
-
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (object instanceof CollectionRest) {
@@ -68,18 +64,15 @@ public class CanManageMappingsFeature implements AuthorizationFeature {
                 return false;
             }
             try {
-                Optional<Collection> collections = collectionService.findCollectionsWithSubmit(StringUtils.EMPTY,
-                                                 context, null, 0, Integer.MAX_VALUE)
-                                                .stream()
-                                                .filter(c -> !c.getID().equals(item.getOwningCollection().getID()))
-                                                .filter(c -> {
-                                                    try {
-                                                        return collectionService.canEditBoolean(context, c);
-                                                    } catch (SQLException e) {
-                                                        throw new RuntimeException(e.getMessage(), e);
-                                                    }
-                                                })
-                                                .findFirst();
+                // Only need two collections: one may be the owning collection, and the other
+                // is the first that demonstrates the user can manage mappings. We check for
+                // ADMIN permissions instead of EDIT + ADD, as ADMIN includes both and is the
+                // usual permission granted.
+                Optional<Collection> collections =
+                    authorizeService.findAdminAuthorizedCollection(context, StringUtils.EMPTY, 0, 2)
+                        .stream()
+                        .filter(c -> !c.getID().equals(item.getOwningCollection().getID()))
+                        .findFirst();
                 return collections.isPresent();
             } catch (SearchServiceException e) {
                 throw new RuntimeException(e.getMessage(), e);
