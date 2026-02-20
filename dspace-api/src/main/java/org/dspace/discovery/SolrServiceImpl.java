@@ -27,6 +27,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -1606,6 +1608,68 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         // otherwise you may accidentally BREAK field-based queries (which often
         // rely on special characters to separate the field from the query value)
         return ClientUtils.escapeQueryChars(query);
+    }
+
+    /**
+     * Utility method to format an autocomplete query over a specific field.
+     *
+     * Takes into account the possibility of receiving a query as a set of clauses separated by AND.
+     * For each clause, it is verified if it can be a Solr query on a specific field. If not, the
+     * clause is formatted to allow autocomplete search on the {@code autocompleteField} field.
+     *
+     * @param query to search for
+     * @param autocompleteField the field to use to autocomplete search, if null or empty no field is used
+     * @return the constructed solr query
+     */
+    @Override
+    public String formatAutoCompleteQuery(String query, String autocompleteField) {
+        if (StringUtils.isNotBlank(query)) {
+
+            String field = "";
+            if (StringUtils.isNotBlank(autocompleteField)) {
+                field = autocompleteField + ":";
+            }
+
+            String[] clauses = query.split(" AND ");
+
+            StringBuilder buildQuery = new StringBuilder();
+            for (int i = 0; i < clauses.length; i++) {
+                String clause = clauses[i];
+                if (isFieldSpecificQuery(clause)) {
+                    // Could be a field query, so we don't need to format the autocomplete search
+                    buildQuery.append(clause);
+                } else {
+                    // Format the clause to allow autocomplete search on the autocompleteField field
+                    String escapedClause = ClientUtils.escapeQueryChars(clause);
+                    buildQuery.append("(").append(escapedClause).append(" OR ").append(field).append("*")
+                        .append(escapedClause).append("*").append(")");
+                }
+
+                if (i < clauses.length - 1) {
+                    buildQuery.append(" AND ");
+                }
+            }
+            return buildQuery.toString();
+        }
+        return query;
+    }
+
+    /**
+     * Checks if the given query part is a field-specific Solr query.
+     *
+     * This method determines whether the provided query part matches the expected pattern
+     * for a fielded Solr query, such as `field:value` or `field:"multi word value"`.
+     * It supports optional negation (with a leading `-`), fields with or without a dot
+     * (e.g., `author` or `author.name`), and values that are either quoted or single tokens.
+     *
+     * @param queryPart the query part to check
+     * @return true if the query part is a field-specific query, false otherwise
+     */
+    private boolean isFieldSpecificQuery(String queryPart) {
+        String regex = "^-?(\\w+\\.\\w+|\\w+):(\"[^\"]+\"|[^\\s]+)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(queryPart.trim());
+        return matcher.find();
     }
 
     @Override
